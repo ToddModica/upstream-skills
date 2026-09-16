@@ -69,7 +69,7 @@
 
 - 推荐：「一种……装置，包括……；其特征在于……（连接/形状限定）」  
 - 避免：「一种……方法，包括以下步骤……」作为唯一独立点  
-- 对话中可选「权利要求偏向」建议（仅对话、不入正文）时，侧重点须来自本稿结构特征，勿凭空捏造。
+- 对话中「本稿可调整」须来自本稿结构特征，勿凭空捏造；定稿回复末块见 **`../delivery_confirm.md`**。
 
 ## 7.6 自检（内部）
 
@@ -82,7 +82,7 @@
 - [ ] 查新使用 `--type utility_model`（或 all 后人工筛）；第二轮不足 4 条已同 IPC 回补，未编造凑数  
 - [ ] 未把外观美感 / 纯方法写成构造主线  
 - [ ] 结构线稿已按 image_gen + structure_lineart_assist + 按件拼装 选用或生成（含 `parts/{视}_{id}.svg`）；件号对齐 StructureSchema；CAD 未入文  
-- [ ] 交付回复：若适用，已按 **`skills/patent-exam-policy/prompts/soft_nudge.md`** 决定是否加政策简报一句（低频）
-- [ ] 交付回复末尾：若 cad_scan 为 `ask_enable_step_parse`，交底已落盘后再反问是否开启 STEP 解析；未得「是」未装依赖
+- [ ] 交付回复末块为 **`## 交付后请确认`**（`../delivery_confirm.md`）；政策简报仅第 4 条且按 **`skills/patent-exam-policy/prompts/soft_nudge.md`**
+- [ ] **`## 交付后请确认` 第 1 条**：若 cad_scan 为 `ask_enable_step_parse`，交底已落盘后再反问是否开启 STEP 解析；未得「是」未装依赖
 
 模版表例见同目录 **`template_reference.md`**。

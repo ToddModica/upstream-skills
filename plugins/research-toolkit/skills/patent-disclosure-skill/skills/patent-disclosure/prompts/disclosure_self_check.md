@@ -70,10 +70,10 @@
 - [ ] **查新类型**：`--type` 与文头专利类型一致（invention / utility_model / design）
 - [ ] **脚本判读**：未因 PowerShell stderr / 乱码 / `NativeCommandError` 把退出码 0 的查新或定稿当成失败；`LATEX_DELIM: hits=` 大于 0 视为分隔符未改好、Word 未出，须改正后重跑，不得交付坏公式 Word
 - [ ] **文末清洁**：正文**无**技能仓库名、`examples/`、`disclosure_draft` 路径、「教学示例」「虚构」「不构成法律承诺」等**元信息脚注**（若存在则删除）
-- [ ] **权利要求偏向点（对话，发明）**：定稿对话是否按发明 **`disclosure_builder.md` §7.6** 给可选建议（**仅对话**）；侧重点源于本稿，**无**凭空捏造
-- [ ] **公式 PNG（对话，发明）**：stderr 若有 `omml_text_fallback` 或 `OMML_FAIL:`，交付后是否已反问是否装 matplotlib 并以 `--math-render` 重出 Word；未得「是」则未安装
-- [ ] **政策感知低频提示（对话，可选）**：若适用，是否已按 **`skills/patent-exam-policy/prompts/soft_nudge.md`** 决定提示或跳过（**至多一句**；未写入正文；未因此自动进入政策简报）
-- [ ] **STEP 解析（对话）**：cad_scan 为 `ask_enable_step_parse` 时，是否已在交底落盘后的交付回复末尾反问；未在 Step 2 中断成文；未得「是」则未安装依赖。仅原生 CAD 则交付末尾已提示导出 STEP
+- [ ] **权利要求偏向点（对话）**：定稿对话是否按 **`prompts/delivery_confirm.md`** 输出 **`## 交付后请确认`**（发明侧重见该文件第 2 条）；侧重点源于本稿，**无**凭空捏造
+- [ ] **公式 PNG（对话，发明）**：stderr 若有 `omml_text_fallback` 或 `OMML_FAIL:`，是否已在 **`## 交付后请确认` 第 1 条**反问是否装 matplotlib 并以 `--math-render` 重出 Word；未得「是」则未安装
+- [ ] **政策感知低频提示（对话，可选）**：若适用，是否已写入 **`## 交付后请确认` 第 4 条**（**`skills/patent-exam-policy/prompts/soft_nudge.md`**；**至多一句**；未写入正文；未因此自动进入政策简报）
+- [ ] **STEP 解析（对话）**：cad_scan 为 `ask_enable_step_parse` 时，是否已在 **`## 交付后请确认` 第 1 条**反问；未在 Step 2 中断成文；未得「是」则未安装依赖。仅原生 CAD 则第 1 条已提示导出 STEP
 
 ## 8.4 实用新型专项
 
@@ -105,5 +105,6 @@
 
 ## 8.6 专利布局 / 专利围栏旁路（交付后，不入正文）
 
-首篇定稿交付后 **`Read` `prompts/fence/guardrails.md`**，只问一句要不要做保护型 1+N。不要先打分再问。用户点名「专利布局 / 专利围栏 / 族树」可强开，但仍须分解 → 突围 → 矩阵 → 立项说明。  
-**禁止**未确认立项说明就批量写多篇。迭代的非首次交付默认跳过本旁路。
+首篇定稿后 **`Read` `prompts/fence/guardrails.md`**，把「要不要做保护型 1+N」写进 **`## 交付后请确认` 第 3 条**（`prompts/delivery_confirm.md`），不要先打分再问。用户点名「专利布局 / 专利围栏 / 族树 / 做围栏」可强开，但仍须分解 → 突围 → 矩阵 → 立项说明。  
+**禁止**未确认立项说明就批量写多篇。迭代的非首次交付默认省略第 3 条。  
+**禁止**在该节把申请文件、案卷或专利地图列为下一步。

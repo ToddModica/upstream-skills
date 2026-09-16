@@ -1,7 +1,7 @@
 ---
 name: patent-disclosure-skill
 description: "中国专利技能：挖掘专利点与编写交底书（发明/实用/外观），把已有交底改写成申请文件四件套，也可按材料交底申请一起做，按著录字段检索公布公告，通俗解读专利，基于已读库打开专利地图，对照审查口径出政策简报，辅助审查答复。| China patents skill: mine patent points and draft disclosures, rewrite an existing disclosure into application documents, or chain disclosure-then-application from inventor materials in one pass (ask when facts are missing; at most three issue-list rounds), search CNIPA bibliographic records, explain patents, open a local patent map from interpreted notes, brief examination-policy changes, and assist office-action responses."
-version: "4.8.1"
+version: "4.10.0"
 user-invocable: true
 argument-hint: "[可选：项目路径 / 交底书 / 申请底稿 / 交底申请一起做 / 专利检索 / 专利号或 PDF / 专利地图 / 专利围栏 / 政策简报 / 审查答复]"
 allowed-tools: Read, Write, Edit, Grep, Glob, WebSearch, Bash
@@ -14,7 +14,7 @@ allowed-tools: Read, Write, Edit, Grep, Glob, WebSearch, Bash
 | 能力 | 做什么 | 何时进入 | 入口 |
 |------|--------|----------|------|
 | **交底** | 挖专利点 → 查新 → 成稿 → 迭代；首篇定稿后可做保护型 1+N 专利布局 | 专利挖掘、交底书、查新、实用新型、外观设计、专利布局、专利围栏、族树、保护型1+N；`/patent-disclosure`、`/交底书` | `skills/patent-disclosure/SKILL.md` |
-| **申请文件** | 已有交底 → 权要 / 说明书 / 摘要 / 附图 | **须显式**且**指定交底目录**：申请文件、申请底稿、申报材料、`/申请底稿`、`/patent-apply`。仅缺材料则终止；内容争议写入问题清单；交付末尾须摘要清单；改已有产出则另存 | `skills/patent-application/SKILL.md` |
+| **申请文件** | 已有交底 → 权要 / 说明书 / 摘要 / 附图 | **须显式**且**指定交底目录**：申请文件、申请底稿、申报材料、`/申请底稿`、`/patent-apply`。仅缺材料则终止；内容争议写入问题清单；**交付后请确认**须摘要清单；改已有产出则另存 | `skills/patent-application/SKILL.md` |
 | **案卷** | 按发明人/工程师给的材料一趟写出交底书和申请文件；清单缺口最多来回三轮，缺事实问人、不编 | **须显式**：交底申请一起做、从零出交底和申请、一条龙、帮写交底再出申请、按清单改、会稿、案卷、`/patent-docket`。只写交底或已有交底只出四件套 → 不要进本案。状态 `outputs/docket/` | `skills/patent-docket/SKILL.md` |
 | **检索** | 公布站高级查询（发明人/申请人/分类号/名称/摘要等）；单图或权要可先抽关键字再查 | 按著录字段查公布公告、个人公开清单、以图/权要生成检索式；`/patent-search`。普通多条件**不要**默认翻完全部分页 | `skills/patent-search/SKILL.md` |
 | **解读** | 公开号 / PDF / 全文 → 通俗笔记 + 图谱 | 读专利、公开号或 PDF 且目标为理解；`/patent-read`、`/读专利` | `skills/patent-reader/SKILL.md` |
@@ -29,8 +29,9 @@ allowed-tools: Read, Write, Edit, Grep, Glob, WebSearch, Bash
 - 专利号或 PDF 且意图为「读懂」→ **优先解读**，不跑交底 Step 1–8。
 - **禁止**因写交底或读专利自动进入政策简报、审查答复、申请文件、案卷或专利地图。申请文件必须用户点名并给出交底目录；缺 schema / 线稿 / 交底书则停，引导先补交底。内容争议不阻塞主文件。
 - **案卷**必须用户点名（交底申请一起做 / 从零出交底和申请 / 一条龙 / 帮写交底再出申请 / 按清单改 / 会稿 / `/patent-docket`）。点名后 `Read` `skills/patent-docket/SKILL.md`；由案卷再 `Read` 交底或申请入口。调度申请视为已点名申请文件，仍须有交底目录。只写交底、或已有交底只出四件套 → 不要进案卷。
-- 用户说「专利布局 / 专利围栏 / 族树 / 保护型1+N」→ **交底包旁路** `prompts/fence/`，不要进专利地图。须分解→突围→矩阵再立项；立项校验写入 `专利布局.md`；未确认立项说明不得分件写多篇交底。
+- 用户说「专利布局 / 专利围栏 / 族树 / 保护型1+N / 做围栏」→ **交底包旁路** `prompts/fence/`，不要进专利地图。须分解→突围→矩阵再立项；立项校验写入 `专利布局.md`；未确认立项说明不得分件写多篇交底。
 - 交底 Step 5 查新只用交底包轻量检索（一词一页）；按发明人/申请人等做著录检索时只用检索包，两者不要混用。
+- 各子技能交付回复末块标题统一为 **交付后请确认**；跨包口令以本表为准，交底不得在此节把申请、案卷、专利地图列为下一步。检索与专利地图可不设此节。
 
 ## 目录
 
@@ -65,4 +66,5 @@ skills/patent-exam-policy/        # 政策简报（技能进化为旁路）
 □ 未跨包调用其他子技能的 tools/
 □ 围栏未确认立项说明未批量写多篇；未把布局说明当成专利地图
 □ 未把政策简报当成改技能；无点名未改交底包以外的目录
+□ 交付回复末块标题为「交付后请确认」；交底该节未把申请、案卷、地图列为下一步
 ```
