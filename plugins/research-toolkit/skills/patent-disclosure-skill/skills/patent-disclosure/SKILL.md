@@ -15,6 +15,7 @@ user-invocable: false
 | Step 3–4 | `prompts/invention/` · `utility_model/` · `design/` 挖点 |
 | 填表 / 线稿 | `prompts/fill_*`、`image_gen.md`、`*_lineart_*.md`；外观视图口径 `references/design_view_cnipa.md` |
 | Step 5 | `prompts/prior_art_search.md`（轻量查新，一词一页） |
+| Step 5.5 | 同文件「**D1 锁定与区别特征 Fk**」：主比对钉一篇最接近 + 逐特征表（可 D2 补行）+ **三态门禁**，落 `查新与区别定位_*.md`。三态都进 Step 6；**不过**仍成文但创造性降级，禁止假 D1 / 空喊创新性强 |
 | Step 6 | `prompts/disclosure_preview.md` |
 | Step 7 | 对应类型 `disclosure_builder.md` + `template_reference.md` |
 | Step 8 | `prompts/disclosure_self_check.md` |

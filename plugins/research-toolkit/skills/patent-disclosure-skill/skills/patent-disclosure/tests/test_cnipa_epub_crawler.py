@@ -15,6 +15,7 @@ from cnipa_epub_crawler import (
     EPUB_TITLE_NO_HIT,
     EPUB_TITLE_RESULT,
     _RESULT_PAGE_READY_JS,
+    _FastSession,
     apply_epub_type_filter,
     search_epub_keywords,
     submit_index_search,
@@ -215,6 +216,154 @@ class StopOnFirstFailureTests(unittest.TestCase):
                                         )
         self.assertEqual(len(rows), 1)
         self.assertEqual(submit.call_count, 2)
+
+
+class FastSessionFallbackTests(unittest.TestCase):
+    def test_abort_is_submit_failed_not_throttled(self) -> None:
+        session = _FastSession(MagicMock())
+        session.page = MagicMock()
+        session.page.evaluate.return_value = {
+            "ok": False,
+            "status": -1,
+            "html": "",
+            "err": "AbortError: The operation was aborted.",
+        }
+        session.pace.interval = 3.0
+        html, reason = session._submit_once("批任务调度", "invention")
+        self.assertIsNone(html)
+        self.assertEqual(reason, "submit_failed")
+        self.assertEqual(session.pace.interval, 3.0)
+
+    def test_query_abort_skips_rebuild(self) -> None:
+        session = _FastSession(MagicMock())
+        session.page = MagicMock()
+        session.page.evaluate.return_value = {
+            "ok": False,
+            "status": -1,
+            "html": "",
+            "err": "AbortError",
+        }
+        session.rebuild = MagicMock(return_value=object())
+        self.assertIsNone(session.query("词", "invention"))
+        session.rebuild.assert_not_called()
+
+    def test_http_reject_still_rebuilds(self) -> None:
+        session = _FastSession(MagicMock())
+        session.page = MagicMock()
+        session.page.evaluate.return_value = {
+            "ok": True,
+            "status": 400,
+            "html": "x" * 3000,
+            "mode": "form",
+        }
+        with patch.object(session, "rebuild", return_value=None) as rebuild:
+            self.assertIsNone(session.query("词", "invention"))
+            rebuild.assert_called_once()
+
+    def test_rebuild_gate_failure_returns_none(self) -> None:
+        browser = MagicMock()
+        ctx = MagicMock()
+        page = MagicMock()
+        ctx.new_page.return_value = page
+        session = _FastSession(browser)
+        with patch("cnipa_epub_crawler._new_context", return_value=ctx):
+            with patch("cnipa_epub_crawler.time.sleep"):
+                with patch(
+                    "cnipa_epub_crawler.wait_for_epub_home_ready",
+                    side_effect=EpubNavError(
+                        "gate", hint="skip_epub", message="无检索框"
+                    ),
+                ):
+                    self.assertIsNone(session.rebuild())
+        self.assertIsNone(session.page)
+        ctx.close.assert_called()
+
+    def test_search_falls_back_to_nav_on_fetch_abort(self) -> None:
+        pw = MagicMock()
+        pw.__enter__.return_value = pw
+        pw.__exit__.return_value = None
+        browser = MagicMock()
+        ctx = MagicMock()
+        page = MagicMock()
+        page.evaluate.return_value = {
+            "ok": False,
+            "status": -1,
+            "html": "",
+            "err": "AbortError",
+        }
+        ctx.new_page.return_value = page
+        cfg = dict(DEFAULTS)
+        cfg["stop_on_first_nav_failure"] = True
+        with patch("cnipa_epub_crawler.sync_playwright", return_value=pw):
+            with patch("cnipa_epub_crawler._launch_browser", return_value=browser):
+                with patch("cnipa_epub_crawler._new_context", return_value=ctx):
+                    with patch("cnipa_epub_crawler.wait_for_epub_home_ready"):
+                        with patch(
+                            "cnipa_epub_crawler.submit_index_search"
+                        ) as submit:
+                            with patch(
+                                "cnipa_epub_crawler._safe_page_content",
+                                return_value="<html></html>",
+                            ):
+                                with patch(
+                                    "cnipa_epub_crawler.parse_search_result_html",
+                                    return_value=[],
+                                ):
+                                    with patch(
+                                        "cnipa_epub_crawler.load_wait_config",
+                                        return_value=cfg,
+                                    ):
+                                        rows = search_epub_keywords(["批任务调度"])
+        self.assertEqual(len(rows), 1)
+        submit.assert_called_once()
+
+    def test_search_falls_back_to_nav_when_rebuild_gate_fails(self) -> None:
+        pw = MagicMock()
+        pw.__enter__.return_value = pw
+        pw.__exit__.return_value = None
+        browser = MagicMock()
+        ctx = MagicMock()
+        page = MagicMock()
+        page.evaluate.return_value = {
+            "ok": True,
+            "status": 400,
+            "html": "x" * 3000,
+            "mode": "form",
+        }
+        ctx.new_page.return_value = page
+        cfg = dict(DEFAULTS)
+        cfg["stop_on_first_nav_failure"] = True
+
+        def _home_ready(_page, max_wait_sec=None):
+            if max_wait_sec is not None:
+                raise EpubNavError("gate", hint="skip_epub", message="重建无框")
+
+        with patch("cnipa_epub_crawler.sync_playwright", return_value=pw):
+            with patch("cnipa_epub_crawler._launch_browser", return_value=browser):
+                with patch("cnipa_epub_crawler._new_context", return_value=ctx):
+                    with patch(
+                        "cnipa_epub_crawler.wait_for_epub_home_ready",
+                        side_effect=_home_ready,
+                    ):
+                        with patch("cnipa_epub_crawler.time.sleep"):
+                            with patch(
+                                "cnipa_epub_crawler.submit_index_search"
+                            ) as submit:
+                                with patch(
+                                    "cnipa_epub_crawler._safe_page_content",
+                                    return_value="<html></html>",
+                                ):
+                                    with patch(
+                                        "cnipa_epub_crawler.parse_search_result_html",
+                                        return_value=[],
+                                    ):
+                                        with patch(
+                                            "cnipa_epub_crawler.load_wait_config",
+                                            return_value=cfg,
+                                        ):
+                                            rows = search_epub_keywords(["批任务调度"])
+        self.assertEqual(len(rows), 1)
+        submit.assert_called_once()
 
 
 if __name__ == "__main__":

@@ -47,8 +47,12 @@ Content-Type 后 POST ``/Dxb/IndexQuery``，拿回的是 **202 + 约 3.1KB 挑�
 说明封禁绑定会话而非 IP，因此：
 
 - 词与词之间必须**节流**（见下「自适应节流」）；
-- 失败后不要原地重试，应**丢弃脏 context 重建**（``_FastSession.rebuild``），
-  且重建前要**先冷却**——刚被限流时新 context 同样过不了 gate。
+- HTTP 400/202、挑战页等**会话已脏**时，不要原地重试，应**丢弃脏 context 重建**
+  （``_FastSession.rebuild``），且重建前要**先冷却**——刚被限流时新 context 同样过不了 gate。
+- 页内 ``fetch`` 的 ``status=-1``（AbortController 超时、导航把执行上下文拆掉）只表示
+  **这一跳提交失败**，会话未必报废。此时保留当前页、回退整页导航；不要当成限流去
+  ``rebuild``。``rebuild`` 自己的 gate 失败也须 ``return None``，让检索循环走导航兜底，
+  禁止把 ``EpubNavError`` 抛出检索循环、整轮 ``skip_epub``。
 
 ===============================================================================
 自适应节流（``_PaceController``）
@@ -216,7 +220,8 @@ FAST_REBUILD_COOLDOWN_SEC = 8.0
 #: 重建后过 gate 的时间预算（秒）。比常规 gate 宽松，因为此时站点正处于收紧状态。
 FAST_REBUILD_GATE_SEC = 40.0
 
-#: 单次 fetch 的浏览器内超时（毫秒）。正常 0.3–0.5 秒返回，超过即视为被限流。
+#: 单次 fetch 的浏览器内超时（毫秒）。正常 0.3–0.5 秒返回；超时由 JS 返回 status=-1，
+#: 按「本跳失败」回退导航，不按会话限流重建。
 FAST_FETCH_TIMEOUT_MS = 8_000
 
 #: 一轮检索里最多重建几次脏会话；超过则本轮放弃快路径，改走整页导航。
@@ -473,7 +478,11 @@ class _FastSession:
         self.page = None
 
     def rebuild(self) -> Any:
-        """丢弃脏会话换新的。返回新 page；超过上限返回 None。"""
+        """丢弃脏会话换新的。返回新 page；超过上限或新会话过不了 gate 时返回 None。
+
+        gate 失败**不**再抛 ``EpubNavError``：调用方会把 ``None`` 当成快路径不可用，
+        回退整页导航。失败的半成品 context 随即关掉，避免把没检索框的页交给导航路径。
+        """
         if self.rebuilds >= FAST_MAX_REBUILD:
             return None
         self.rebuilds += 1
@@ -485,7 +494,19 @@ class _FastSession:
         # 刚被限流时立刻重建仍会被挡在 gate 外，先静默冷却。
         time.sleep(FAST_REBUILD_COOLDOWN_SEC)
         self.ensure_page()
-        wait_for_epub_home_ready(self.page, max_wait_sec=FAST_REBUILD_GATE_SEC)
+        try:
+            wait_for_epub_home_ready(self.page, max_wait_sec=FAST_REBUILD_GATE_SEC)
+        except EpubNavError as exc:
+            progress(
+                f"stage=rebuild_gate_failed hint={exc.hint or '-'} fallback=nav"
+            )
+            print(
+                "EPUB_NOTE: rebuild_gate_failed fallback=nav",
+                file=sys.stderr,
+                flush=True,
+            )
+            self.close()
+            return None
         return self.page
 
     # -- 提交 --------------------------------------------------------------
@@ -499,9 +520,10 @@ class _FastSession:
 
         返回 ``(html, reason)``：
 
-        - ``("...", "ok")``        成功
-        - ``(None, "throttled")``  站点拒绝/超时 —— 会话已脏，值得冷却后重建重试
-        - ``(None, "unsupported")`` 环境或站点结构不支持 fetch —— 重试无意义，直接回退
+        - ``("...", "ok")``          成功
+        - ``(None, "throttled")``    HTTP 拒绝/挑战页 —— 会话已脏，值得冷却后重建
+        - ``(None, "submit_failed")`` 页内 fetch 中断（status=-1 / Abort）—— 保留会话，回退导航
+        - ``(None, "unsupported")``  环境或站点结构不支持 fetch —— 重试无意义，直接回退
         """
         self._throttle()
         started = time.monotonic()
@@ -524,22 +546,31 @@ class _FastSession:
             return None, "unsupported"
         html = res.get("html")
         status = res.get("status")
+        err = str(res.get("err") or "").strip()
+        html_len = len(html) if isinstance(html, str) else 0
         if res.get("ok") and status == 200 and _looks_like_result_html(html):
             progress(
-                f"stage=fetch term={keyword} ms={rtt * 1000:.0f} bytes={len(html)} "
+                f"stage=fetch term={keyword} ms={rtt * 1000:.0f} bytes={html_len} "
                 f"mode={res.get('mode') or '-'}"
             )
             self.pace.observe(rtt, "ok")
             return html, "ok"
+        # status=-1：AbortController / 执行上下文被拆掉。不是 400/202 那种会话封禁。
+        if status == -1 or not res.get("ok"):
+            reason = "submit_failed"
+        else:
+            reason = "throttled"
+        extra = f" err={err[:120]}" if err else ""
         progress(
             f"stage=fetch_reject term={keyword} status={status} "
-            f"bytes={len(html) if isinstance(html, str) else 0}"
+            f"bytes={html_len} reason={reason}{extra}"
         )
-        self.pace.observe(rtt, "throttled")
-        return None, "throttled"
+        # 中断不拉大节流间隔，避免偶发 abort 把后续词全部拖慢。
+        self.pace.observe(rtt, "throttled" if reason == "throttled" else "unsupported")
+        return None, reason
 
     def query(self, keyword: str, patent_type: str) -> str | None:
-        """提交一个词；被限流则重建会话重试一次。彻底不可用返回 None。
+        """提交一个词；仅会话级限流才重建；本跳中断或重建失败则返回 None 走导航。
 
         gate 由调用方在循环内先行保证（见 ``ensure_page`` 注释）。
         """
@@ -549,7 +580,7 @@ class _FastSession:
         if reason == "ok":
             return html
         if reason != "throttled":
-            # 环境/结构问题：重建救不回来，别白等冷却。
+            # 本跳失败或结构不支持：保留当前页，让调用方走整页导航。
             return None
         if self.rebuild() is None:
             return None
