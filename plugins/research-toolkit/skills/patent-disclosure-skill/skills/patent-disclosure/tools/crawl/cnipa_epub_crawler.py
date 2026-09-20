@@ -276,6 +276,53 @@ _FAST_FETCH_JS = """async ({term, states, timeoutMs}) => {
   }
 }"""
 
+# 公布模式结果页把 #pageSize 改成 10 再 POST #query_form。
+# 快路径第一跳仍停在首页，必须用结果 HTML 的 DOMParser，不能改当前页表单。
+# 不要清空 #searchAfter（公布站会 HTTP 400）。
+_RESULT_RESIZE_JS = """async ({ html, pageSize, timeoutMs }) => {
+  const wanted = String(pageSize);
+  const parsed = new DOMParser().parseFromString(html || '', 'text/html');
+  const form = parsed.querySelector('#query_form')
+    || parsed.querySelector('form#query_form')
+    || parsed.querySelector('form[name="query_form"]');
+  const sizeEl = form && form.querySelector('#pageSize');
+  if (!form || !sizeEl) return { ok: false, reason: 'no_form' };
+  if (sizeEl.value === wanted) return { ok: true, skipped: true, html };
+  sizeEl.value = wanted;
+  const sel = form.querySelector('#sizeSelect');
+  if (sel) sel.value = wanted;
+  const pageNum = form.querySelector('#pageNum');
+  if (pageNum) pageNum.value = '1';
+  const rawAction = form.getAttribute('action');
+  let url;
+  try {
+    url = rawAction ? new URL(rawAction, location.origin).href
+      : new URL('/Dxb/IndexQuery', location.origin).href;
+  } catch (e) {
+    url = '/Dxb/IndexQuery';
+  }
+  try {
+    const body = new URLSearchParams(new FormData(form));
+    body.set('pageSize', wanted);
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), timeoutMs);
+    const res = await fetch(url, {
+      method: (form.getAttribute('method') || 'POST').toUpperCase(),
+      headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+      body: body.toString(),
+      credentials: 'include',
+      signal: ctrl.signal,
+    });
+    clearTimeout(t);
+    const text = await res.text();
+    if (!res.ok) return { ok: false, reason: 'http_' + res.status };
+    return { ok: true, skipped: false, html: text };
+  } catch (e) {
+    return { ok: false, reason: 'exception', message: String(e) };
+  }
+};
+"""
+
 
 def _cfg() -> dict:
     return load_wait_config()
@@ -307,6 +354,54 @@ def _looks_like_result_html(html: Any) -> bool:
         or EPUB_TITLE_NO_HIT in html
         or 'class="item"' in html
     )
+
+
+def _result_page_size() -> int:
+    raw = _cfg().get("result_page_size", 10)
+    try:
+        n = int(raw)
+    except (TypeError, ValueError):
+        return 10
+    return n if n in (3, 10) else 10
+
+
+def _enlarge_result_html(page, html: str) -> str:
+    """公布模式默认每页 3 条；配置为 10 时用结果页表单再拉一页。失败则保留原 HTML。"""
+    wanted = _result_page_size()
+    if wanted == 3 or not html:
+        return html
+    try:
+        res = page.evaluate(
+            _RESULT_RESIZE_JS,
+            {
+                "html": html,
+                "pageSize": wanted,
+                "timeoutMs": FAST_FETCH_TIMEOUT_MS,
+            },
+        )
+    except Error:
+        return html
+    if not isinstance(res, dict) or not res.get("ok"):
+        reason = res.get("reason") if isinstance(res, dict) else "unsupported"
+        print(
+            f"EPUB_NOTE: page_size_resize_skip wanted={wanted} reason={reason}",
+            file=sys.stderr,
+            flush=True,
+        )
+        return html
+    new_html = res.get("html")
+    if not isinstance(new_html, str) or not _looks_like_result_html(new_html):
+        return html
+    if res.get("skipped"):
+        return html
+    n_old = len(parse_search_result_html(html))
+    n_new = len(parse_search_result_html(new_html))
+    print(
+        f"EPUB_NOTE: page_size {n_old}->{n_new} wanted={wanted}",
+        file=sys.stderr,
+        flush=True,
+    )
+    return new_html
 
 
 def _pace_path() -> Path | None:
@@ -676,6 +771,7 @@ def search_epub_keywords(
                                 patent_type=patent_type,
                             )
                         html = _safe_page_content(page)
+                    html = _enlarge_result_html(page, html)
                     out.append((html, parse_search_result_html(html)))
                 except EpubNavError as exc:
                     remaining = total - i

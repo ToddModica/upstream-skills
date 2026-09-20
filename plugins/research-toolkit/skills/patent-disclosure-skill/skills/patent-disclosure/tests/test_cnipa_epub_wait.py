@@ -32,6 +32,8 @@ class WaitConfigTests(unittest.TestCase):
         self.assertEqual(cfg["submit_timeout_ms"], 40_000)
         self.assertEqual(cfg["advanced_max_class_codes"], 1)
         self.assertEqual(cfg["advanced_max_terms"], 1)
+        self.assertEqual(cfg["home_max_terms"], 4)
+        self.assertEqual(cfg["result_page_size"], 10)
         self.assertTrue(cfg["stop_on_first_nav_failure"])
         self.assertEqual(set(cfg), set(DEFAULTS))
 
@@ -66,6 +68,30 @@ class WaitConfigTests(unittest.TestCase):
 
     def test_default_yaml_path_next_to_module(self) -> None:
         self.assertEqual(wait_yaml_path().name, "cnipa_epub_wait.yaml")
+
+    def test_result_page_size_only_three_or_ten(self) -> None:
+        with tempfile.NamedTemporaryFile(
+            "w", suffix=".yaml", delete=False, encoding="utf-8"
+        ) as fh:
+            fh.write("result_page_size: 20\nhome_max_terms: 4\n")
+            path = fh.name
+        try:
+            os.environ["EPUB_WAIT_YAML"] = path
+            cfg = load_wait_config(force_reload=True)
+            self.assertEqual(cfg["result_page_size"], 10)
+        finally:
+            Path(path).unlink(missing_ok=True)
+        with tempfile.NamedTemporaryFile(
+            "w", suffix=".yaml", delete=False, encoding="utf-8"
+        ) as fh:
+            fh.write("result_page_size: 3\n")
+            path = fh.name
+        try:
+            os.environ["EPUB_WAIT_YAML"] = path
+            cfg = load_wait_config(force_reload=True)
+            self.assertEqual(cfg["result_page_size"], 3)
+        finally:
+            Path(path).unlink(missing_ok=True)
 
 
 if __name__ == "__main__":

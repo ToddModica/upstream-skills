@@ -17,6 +17,7 @@ from cnipa_epub_crawler import (
     _RESULT_PAGE_READY_JS,
     _FastSession,
     apply_epub_type_filter,
+    _enlarge_result_html,
     search_epub_keywords,
     submit_index_search,
     wait_for_epub_home_ready,
@@ -364,6 +365,50 @@ class FastSessionFallbackTests(unittest.TestCase):
                                             rows = search_epub_keywords(["批任务调度"])
         self.assertEqual(len(rows), 1)
         submit.assert_called_once()
+
+
+class ResultPageSizeTests(unittest.TestCase):
+    def test_defaults(self) -> None:
+        self.assertEqual(DEFAULTS["result_page_size"], 10)
+        self.assertEqual(DEFAULTS["home_max_terms"], 4)
+
+    def test_enlarge_skipped_when_size_is_three(self) -> None:
+        page = MagicMock()
+        cfg = dict(DEFAULTS)
+        cfg["result_page_size"] = 3
+        with patch("cnipa_epub_crawler.load_wait_config", return_value=cfg):
+            out = _enlarge_result_html(page, "<html>keep</html>")
+        self.assertEqual(out, "<html>keep</html>")
+        page.evaluate.assert_not_called()
+
+    def test_enlarge_keeps_html_on_failure(self) -> None:
+        page = MagicMock()
+        page.evaluate.return_value = {"ok": False, "reason": "no_form"}
+        cfg = dict(DEFAULTS)
+        cfg["result_page_size"] = 10
+        html = "<html>" + ("x" * 3000) + EPUB_TITLE_RESULT + "</html>"
+        with patch("cnipa_epub_crawler.load_wait_config", return_value=cfg):
+            out = _enlarge_result_html(page, html)
+        self.assertEqual(out, html)
+
+    def test_enlarge_uses_resized_html(self) -> None:
+        page = MagicMock()
+        new_html = "<html>" + ("y" * 3000) + EPUB_TITLE_RESULT + "</html>"
+        page.evaluate.return_value = {
+            "ok": True,
+            "skipped": False,
+            "html": new_html,
+        }
+        cfg = dict(DEFAULTS)
+        cfg["result_page_size"] = 10
+        old = "<html>" + ("x" * 3000) + EPUB_TITLE_RESULT + "</html>"
+        with patch("cnipa_epub_crawler.load_wait_config", return_value=cfg):
+            with patch(
+                "cnipa_epub_crawler.parse_search_result_html",
+                side_effect=[[1], [1, 2, 3]],
+            ):
+                out = _enlarge_result_html(page, old)
+        self.assertEqual(out, new_html)
 
 
 if __name__ == "__main__":

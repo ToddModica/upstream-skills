@@ -2,7 +2,7 @@
 
 # 中国专利.skill
 
-> 专利点挖掘与交底书（发明/实用/外观）编写，已有交底改写成申请文件，交底到申请可以一起做，公布公告著录检索，通俗解读专利，对照审查口径出政策简报，辅助审查答复。
+> 专利点挖掘、交底书（发明/实用/外观）与申请文件编写；按图或权要等多条件检索；通俗解读专利和地图探索；审查政策解读；辅助审查答复。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.9+](https://img.shields.io/badge/Python-3.9%2B-blue.svg)](https://www.python.org/)
@@ -131,14 +131,14 @@
 <tr>
 <td nowrap><a href="skills/patent-application/README.md"><code style="white-space:nowrap">patent-application</code></a></td>
 <td nowrap>申请文件</td>
-<td>交底别再停在「给所里看的草稿」——一口气改成权要、说明书、摘要和黑白附图，说不清的进问题清单，不卡死整套文件</td>
+<td>已有交底，改成权要、说明书、摘要和附图；说不清的写入问题清单，不挡住整套文件</td>
 <td>「申请文件」· 「申请底稿」</td>
 <td nowrap><a href="skills/patent-application/README.md">详情</a></td>
 </tr>
 <tr>
 <td nowrap><a href="skills/patent-docket/README.md"><code style="white-space:nowrap">patent-docket</code></a></td>
 <td nowrap>案卷会稿</td>
-<td>角色扮演交底工程师 vs 专利代理师：自主多轮规划工作流，材料一丢就出交底和申请，清单最多对打三轮，缺事实就问、绝不瞎编</td>
+<td>角色扮演交底工程师 vs 专利代理师：自主多轮规划工作流，材料一丢就出交底和申请，缺事实就问、绝不瞎编</td>
 <td>「交底申请一起做」· 「从零出交底和申请」</td>
 <td nowrap><a href="skills/patent-docket/README.md">详情</a></td>
 </tr>
@@ -152,7 +152,7 @@
 <tr>
 <td nowrap><a href="skills/patent-map/README.md"><code style="white-space:nowrap">patent-map</code></a></td>
 <td nowrap>专利地图</td>
-<td>解读入库攒下来的案子摊开成图：语义地形、申请人四象限、同族引证网络、技术功效矩阵、仪表盘；本机独立服务，浏览器打开即可探索</td>
+<td>解读入库攒下来的案子摊开成图：语义地形、申请人四象限、同族引证网络、技术功效矩阵、仪表盘；本地私有化运行，浏览器打开即可</td>
 <td>「专利地图」· 「案例地图」</td>
 <td nowrap><a href="skills/patent-map/README.md">详情</a></td>
 </tr>
