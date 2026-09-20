@@ -1,12 +1,14 @@
 # Codex 上游 Skills Marketplace
 
-这是一个公开的 Codex Git Marketplace，用于分发具有明确上游来源和可再分发许可证的科研、写作、文档及开发工作流。每个第三方 Skill 保留原目录、脚本、参考资料、资源文件和许可证；版本与 commit SHA 记录在 `sources.json`。
+这是一个公开的 Codex Git Marketplace，用于分发具有明确上游来源和可再分发许可证的科研、写作、文档及开发工作流。每个已打包的第三方 Skill 保留原目录、脚本、参考资料、资源文件和许可证；版本与 commit SHA 记录在 `sources.json`。少数外部插件（当前为 Tavotto）只在市场清单中引用其官方发布分支，不复制其上游代码。
 
 ## 许可证边界
 
 仓库根目录的 MIT License 只适用于本仓库新增的包装脚本、清单、校验器和文档，不会改变第三方内容的许可证。
 
 特别注意：Academic Research Skills 与其 Codex 版本使用 **CC-BY-NC-4.0**，要求署名并限制商业使用。其他已打包来源使用 MIT 或 Apache-2.0。完整归属见 `THIRD_PARTY_NOTICES.md`，每个 Skill 的锁定许可证位置见 `sources.json`。
+
+Tavotto 通过其官方 `plugin-stable` 分支按需拉取，许可证为 **AGPL-3.0**；本仓库仅保存其插件来源引用，未重新分发 Tavotto 代码。使用和再分发 Tavotto 时应遵守其上游许可证。
 
 ## 上游 GitHub 来源
 
@@ -17,7 +19,7 @@
 - 专利与 SciPilot：[`patent-disclosure-skill`](https://github.com/handsomestWei/patent-disclosure-skill)；[`scipilot-cite-skill`](https://github.com/Haojae/scipilot-cite-skill)、[`scipilot-figure-skill`](https://github.com/Haojae/scipilot-figure-skill)、[`scipilot-writing-skill`](https://github.com/Haojae/scipilot-writing-skill)。
 - 写作：[`humanizer`](https://github.com/blader/humanizer)、[`humanizer-zh`](https://github.com/op7418/Humanizer-zh)、[`shuorenhua`](https://github.com/MrGeDiao/shuorenhua)、[`stop-slop`](https://github.com/hardikpandya/stop-slop)。
 - 开发与文档：[`bilibili-page-reader`、`powershell-safe-invocation`](https://github.com/Misaka-Mikoto-Tech/agent-skills)、[`design-taste-frontend`](https://github.com/Leonxlnx/taste-skill)、[`ppt-master`](https://github.com/hugohe3/ppt-master)、[`grilling`](https://github.com/mattpocock/skills)。
-- 插件与 MCP：[`ponytail`](https://github.com/DietrichGebert/ponytail)、[`watermarks-remover`](https://github.com/guillaumemeyer/watermarks-remover)、[`no-negative-echo`](https://github.com/LB623/no-negative-echo)、[`itasca-mcp`](https://github.com/yusong652/itasca-mcp)。
+- 插件与 MCP：[`ponytail`](https://github.com/DietrichGebert/ponytail)、[`watermarks-remover`](https://github.com/guillaumemeyer/watermarks-remover)、[`no-negative-echo`](https://github.com/LB623/no-negative-echo)、[`itasca-mcp`](https://github.com/yusong652/itasca-mcp)、[`Tavotto`](https://github.com/Tavotto/Tavotto)。Tavotto 的插件来源固定为上游 `plugin-stable` 发布分支。
 - CAD 运行时：专利工具的 STEP/SVG 处理使用 [`CadQuery`](https://github.com/CadQuery/cadquery)。
 
 `imagegen`、`openai-docs`、`skill-creator`、`skill-installer`、`doc` 与 `pdf` 由 Codex 运行时提供；当前 `sources.json` 不含其可公开锁定的 GitHub 上游地址。
@@ -42,6 +44,7 @@ codex plugin add codex-utility-toolkit@research-toolkit-marketplace
 codex plugin add ponytail@research-toolkit-marketplace
 codex plugin add watermarks-remover@research-toolkit-marketplace
 codex plugin add no-negative-echo@research-toolkit-marketplace
+codex plugin add tavotto@research-toolkit-marketplace
 ```
 
 安装后新建 Codex 任务，使 Skills、Hooks 和 MCP 工具加载。
@@ -99,6 +102,19 @@ curl.exe -s http://127.0.0.1:8765/health
 
 插件内 `Start-Service.ps1` 支持按需隐藏启动，使用结束后保持运行。远程服务地址和鉴权通过本机环境变量配置。
 
+### Tavotto
+
+Tavotto 用于在不改动 Matplotlib 源脚本的前提下，交互编辑、预检并导出科研图。公开市场条目代理其官方 `plugin-stable` 分支，包含 `tavotto-figure` Skill 与本地 MCP 服务。安装插件后，还需安装引擎：
+
+```powershell
+py -3 -m pip install --user pipx
+py -3 -m pipx install "tavotto[worker]"
+tavotto codex install
+tavotto codex doctor
+```
+
+Windows 上每次 Tavotto 插件升级后都应再运行一次 `tavotto codex install`，以校正 MCP 使用的 Python 启动器。只安装 Tavotto 桌面版时可交接图形到桌面窗口；若要在 Codex 内使用 Tavotto MCP 画布与导出工具，仍需安装上述 `tavotto[worker]` 引擎。完成安装后必须新建 Codex 任务。
+
 ## 主要本机依赖
 
 ### PPT Master
@@ -147,6 +163,7 @@ codex plugin add codex-utility-toolkit@research-toolkit-marketplace
 codex plugin add ponytail@research-toolkit-marketplace
 codex plugin add watermarks-remover@research-toolkit-marketplace
 codex plugin add no-negative-echo@research-toolkit-marketplace
+codex plugin add tavotto@research-toolkit-marketplace
 ```
 
 更新后新建 Codex 任务。
@@ -171,6 +188,7 @@ codex plugin remove codex-utility-toolkit@research-toolkit-marketplace
 codex plugin remove ponytail@research-toolkit-marketplace
 codex plugin remove watermarks-remover@research-toolkit-marketplace
 codex plugin remove no-negative-echo@research-toolkit-marketplace
+codex plugin remove tavotto@research-toolkit-marketplace
 codex plugin marketplace remove research-toolkit-marketplace
 ```
 
