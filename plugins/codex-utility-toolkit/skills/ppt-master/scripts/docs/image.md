@@ -163,14 +163,20 @@ crop, mask, rotation, mirror, opacity, shadow, scrim, outline, and overlap remai
 native SVG/PPT treatments. This tool does not perform semantic background
 removal: use `slice_images.py --alpha --bg <key> --strict-alpha` for flat-color
 keys (a pure red/green/blue key also recovers soft alpha and removes spill from
-key-dominant blends, leaving an opaque foreground of the key's hue untouched; thin
-dark strokes of that hue can still fringe, so choose the key by hue absence;
+key-dominant blends — including a light element's edge next to the key — taking
+the recovered key channel from the strongest other channel so shadows stay grey,
+while an opaque foreground of the key's hue stays untouched; thin dark strokes of
+that hue can still fringe, so choose the key by hue absence;
 strict alpha diagnoses off-key haze from the four 10% key-only margins, allowing
 soft shadows and glows on a clean key; a key-hued ground that is not flat —
 a gradient, lighting, or texture painted by the image model — is keyed by
 key-channel dominance against a local ground estimate instead of one colour,
-with a notice to inspect the cut, while a flat ground that merely differs from
-the stated key is still rejected with the measured colour to rerun with), an
+with a notice to inspect the cut, as is a flat ground farther from every pure
+key than drift explains (the measured `--bg` rerun, or the sheet's own ground
+without `--bg`) so shadows cast on it clear — a measured ground within drift
+of a pure key keeps pure-key recovery — while a flat ground that merely
+differs from the stated key is still rejected with the measured colour to rerun
+with), an
 already prepared RGBA asset or the active host image editor for a standalone cutout, and
 [`image-generator.md`](../../references/image-generator.md) §4.4 only for
 registered subject/base layers.
@@ -293,7 +299,7 @@ python3 scripts/image_search.py "abstract gradient" \
 
 Suitability & manual replacement (a web top hit is metadata-relevant, not guaranteed visually right):
 
-- By default only the best match is downloaded, plus a downscaled review copy at `images/.review/<stem>.jpg` (the placed asset stays full-resolution). A downloaded camera multi-picture JPEG (MPO, common among Commons originals) is rewritten as its primary frame before validation so every later consumer sees a single-frame JPEG.
+- By default only the best match is downloaded, plus a downscaled review copy at `images/.review/<stem>.jpg` (the placed asset stays full-resolution). A downloaded camera multi-picture JPEG (MPO, common among Commons originals) is rewritten as its primary frame before validation so every later consumer sees a single-frame JPEG. An original above Pillow's decompression-warning size (about 89.5 megapixels) is first reduced by the smallest power of two that fits, keeping format, EXIF, and ICC data, so later readers neither warn nor decode hundreds of megabytes.
 - For exact subjects (landmarks, people, companies, products), use `--require-terms` or batch `required_terms` so visually plausible but wrong metadata is rejected before ranking. Example: `--require-terms Chongqing --require-terms "Jiefangbei|Liberation Monument"`. Keep proper-name / geography anchors; do not broaden to generic terms like `canyon`, `stone pillar`, or `ancient town` just to improve coverage.
 - When the current Generate agent can inspect images, use `--save-candidates`. The tool saves only the first ranked page of review-eligible provider previews (**8 by default**), writes `candidates/<stem>/review_sheet.jpg`, and leaves the target image and `image_sources.json` untouched. Standalone CLI use remains best-only unless this flag is explicit.
 - Compare the thumbnail set against the active Reference/Crop Policy. Only after one passes, run `--promote candidate_03.jpg --filename <name>.jpg`; this downloads and validates exactly that original. In batch mode, pass the same `--batch images/image_queries.json` so `Needs-Selection` becomes `Sourced`.

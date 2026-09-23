@@ -1,6 +1,6 @@
 {
   "name": "watermarks-remover",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "description": "Inspect and clean AI provenance metadata and invisible Unicode from content you own.",
   "author": {
     "name": "watermarks-remover contributors; marketplace packaging by research-toolkit maintainers"
