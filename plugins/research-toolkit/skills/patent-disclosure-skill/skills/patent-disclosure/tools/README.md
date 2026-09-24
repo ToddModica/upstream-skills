@@ -54,9 +54,9 @@ python tools/run_step_to_views.py --enable-step-parse -i a.step -o outputs/case/
 | 脚本 / 文档 | 作用 |
 |-------------|------|
 | **`references/formulas/paradigms.yaml`** | 无原文时的起草菜单 |
-| **`references/schemas/formula_plan.schema.yaml`** | 案件 `formula_plan.yaml` 合同（`origin` / `omitted`） |
+| **`references/schemas/formula_plan.schema.yaml`** | 案件 `formula_plan.yaml` 合同（`origin` / `source_kind` / `verified` / `omitted`） |
 | **`formula_paradigms.py`** | `list` / `show` / `combos`（支持案件目录覆盖） |
-| **`check_formula_plan.py`** | 校验来源标记、agent 选题 id、禁装饰音、数值例；`--eval` 简单式代算；化学守恒 / 量纲粗检 |
+| **`check_formula_plan.py`** | 校验来源标记、`source_kind` / 未核对、agent 选题 id、禁装饰音、数值例；`--eval` 简单式代算；化学守恒 / 量纲粗检 |
 
 ```bash
 python tools/formula_paradigms.py list
@@ -122,7 +122,7 @@ python tools/structure_callout_overlay.py --case-dir outputs/case --anchors outp
 
 ## Office / mermaid
 
-用 **`docx_to_md.py`**、**`pptx_to_md.py`**、**`mermaid_render.py`** 等。
+用 **`docx_to_md.py`**、**`pptx_to_md.py`**、**`pdf_to_md.py`**、**`mermaid_render.py`** 等。
 
 ## mermaid_render.py — mermaid：图示 → PNG + 定稿 Markdown + **默认生成 Word**
 
@@ -372,12 +372,53 @@ python tools/pptx_to_md.py -i ./raw/deck.pptx -o ./knowledge/deck.md --media-dir
 
 整仓从仓库根调用：`python skills/patent-disclosure/tools/…`。单独拷走本包时本目录即为 `tools/`。
 
+---
+
+## pdf_to_md.py — PDF → Markdown + 抽取图片
+
+将 **.pdf** 按页导出为 Markdown，并抽取页面中的**嵌入位图**，便于 **`Read` 与 Step 2 扫描**。**Step 2** 对用户指定扫描根内的 `.pdf` 应先转换再读产出 `.md`（跳过 `node_modules/` 等），见 `skills/patent-disclosure/prompts/project_scan.md`。
+
+### 依赖（可选）
+
+本目录 **`requirements-pdf.txt`**（**pymupdf**）。不要装进根目录 `requirements.txt`。解读 / 审查答复若已装过 pymupdf，可复用。
+
+```bash
+pip install -r skills/patent-disclosure/tools/requirements-pdf.txt
+```
+
+单独拷走本包时：`pip install -r tools/requirements-pdf.txt`。
+
+### 用法
+
+```bash
+python tools/pdf_to_md.py --input path/to/设计说明.pdf --output outputs/case/design.md
+```
+
+- 默认图片目录：`outputs/case/design_media/`，文件名形如 `slide03_img0001.png`。
+- 自定义图片目录：
+
+```bash
+python tools/pdf_to_md.py -i ./raw/spec.pdf -o ./knowledge/spec.md --media-dir ./knowledge/spec_assets
+```
+
+每页输出二级标题 `## 第 N 页`，其后为该页文本层，再跟当页图片的相对路径 `![](…)`，不把图堆到文末。
+
+退出码：`0` 成功（文字过少会在 stderr 警告扫描件）；`2` 文件不存在；`3` 无法打开；`4` 既无文字也无图（不写 `.md`）。
+
+### 局限（pymupdf）
+
+- 只抽文本层与嵌入位图；扫描件几乎没字时请先 OCR，或接受只有图、几乎没正文。
+- 部分 PDF 的矢量图层会抽出纯色碎片图，一般可忽略。
+- **不要**把本脚本当成「PDF 出图 / 生成附图」。
+
+整仓从仓库根调用：`python skills/patent-disclosure/tools/…`。单独拷走本包时本目录即为 `tools/`。
+
 通俗解读、著录检索、审查答复的脚本在各自技能包，不在本目录。
 
 ---
 
 ## 扩展其它脚本时
 
-- Word / PPT 转换依赖写在 `requirements.txt`。
+- Word / PPT 转换依赖写在根目录 `requirements.txt`；PDF 转换为可选 `tools/requirements-pdf.txt`（pymupdf）。
 - 在 `SKILL.md`「工具与数据来源」表中增加一行调用说明。
 - 勿将密钥写入仓库；配置使用环境变量或用户主目录。

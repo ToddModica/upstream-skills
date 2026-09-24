@@ -30,7 +30,7 @@ import json
 import argparse
 import defusedxml.ElementTree as ET
 import requests
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlparse
 
 from converters import (
     convert_from_medline,
@@ -43,6 +43,12 @@ EUTILS_BASE = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
 CROSSREF_BASE = "https://api.crossref.org/works"
 ARXIV_BASE = "https://export.arxiv.org/api/query"
 DELAY = 0.5
+ALLOWED_HOSTS = {"eutils.ncbi.nlm.nih.gov", "api.crossref.org", "export.arxiv.org"}
+
+
+def _is_allowed_url(url):
+    """Only allow requests to the known, hardcoded API hosts (mitigates SSRF)."""
+    return urlparse(url).hostname in ALLOWED_HOSTS
 
 
 # ── PubMed ──────────────────────────────────────────────────────
@@ -51,6 +57,9 @@ def esearch(query, max_results=5):
     params = {"db": "pubmed", "term": query, "retmax": max_results, "retmode": "xml"}
     url = f"{EUTILS_BASE}/esearch.fcgi?{urlencode(params)}"
     try:
+        if not _is_allowed_url(url):
+            print("  ESearch error: URL host not in allowlist")
+            return []
         resp = requests.get(url, timeout=30)
         xml_data = resp.text
         root = ET.fromstring(xml_data)

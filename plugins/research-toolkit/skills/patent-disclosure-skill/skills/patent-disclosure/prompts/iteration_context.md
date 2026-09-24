@@ -67,7 +67,7 @@ python skills/patent-disclosure/tools/iteration_dialog_log.py --case-dir "{案�
 
 1. 读本文 → 按上表选 `merger.md` 或 `correction_handler.md` 并 **`Read`**。
 2. **`Read`** 基准稿 + 本轮补充材料；实用/外观若改图或主题，**`Read`/`Write` `figure_plan.yaml`（无则创建）**。  
-   - 若本轮**新增/更新**了目录内文件：再跑 **`tools/cad_scan.py -r …`**（规则同 `project_scan.md`「CAD / STEP」）。  
+   - 若本轮**新增/更新**了目录内文件：再跑 **`tools/cad_scan.py -r …`**（规则同 `project_scan.md`「CAD / STEP」）。新补 `.tex` 则按 **`prompts/tex_scan.md`** 刷新清单。  
    - `ask_enable_step_parse` → **本轮成文不中断**；确认前不装依赖、不改 STEP 视图；**`## 交付后请确认` 第 1 条**再反问。`hint_export_step` → 该节第 1 条提示导出 STEP。  
    - 外观：按 `image_gen.md` + `design_lineart_assist.md` 重评/补线稿（不问用户；实拍与线稿都入 md 与 Word；CAD 不入文）。  
    - 实用：按 `image_gen.md` + `structure_lineart_assist.md` + `structure_lineart_compose.md` 重评/补线稿（不问用户；按件写出子 SVG 再拼总图；件号 overlay；CAD 不入文）。  

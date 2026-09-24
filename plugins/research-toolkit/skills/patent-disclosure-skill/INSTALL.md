@@ -94,6 +94,12 @@ python skills/patent-disclosure/tools/md_to_docx.py -i 定稿.md -o 定稿.docx 
 
 **实用新型 / 外观**定稿以各类型 `skills/patent-disclosure/prompts/utility_model|design/disclosure_builder.md` 为准：填表产出 `structure_schema`/`appearance_schema` + **`figure_plan.yaml`**，成文只嵌清单入文图（结构图或视图；docx 对实用建议、对外观可选）。不跑发明 mermaid 时，仍建议装 `requirements.txt`（扫 Word/PPT、出 docx）。
 
+扫描目录里有 **PDF** 时再装：
+
+```bash
+pip install -r skills/patent-disclosure/tools/requirements-pdf.txt
+```
+
 仅在编辑器里**手写** Markdown、完全不跑仓库脚本时，才不必装 Python。
 
 细则见 **`skills/patent-disclosure/tools/README.md`**。

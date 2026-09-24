@@ -31,7 +31,7 @@
 
 ### 符号与体例
 
-- [ ] **formula_plan（发明含公式）**：案件目录已有 `formula_plan.yaml`；每条式已标 `origin`；`source` 未改写成范式模板且有 `source_ref`（或等价出处）；`agent` 的 `paradigm_id`∈合并后的范式库；材料未采用的式已进 `omitted`；`check_formula_plan.py` 通过或等价手检通过
+- [ ] **formula_plan（发明含公式）**：案件目录已有 `formula_plan.yaml`；每条式已标 `origin`；`source` 未改写成范式模板且有 `source_ref`（或等价出处）；source 式已标 `source_kind`（有 `.tex` 则为 `tex`，且优先对 `tex_formula_inventory.md`，成文不必再载入 `.tex`）；`verified: false` / `pdf_text` 未当作 Fk；`agent` 的 `paradigm_id`∈合并后的范式库；材料未采用的式已进 `omitted`；`check_formula_plan.py` 通过或等价手检通过
 - [ ] **保真（有材料公式时）**：3.4.1 主式能否对上材料（项、算符、条件未被丢掉或换成库内简单式）？
 - [ ] **符号表（3.4.1）**：全文含公式时是否已设 **3.4.1** 并 **先定义符号**（含义、下标、量纲）；式 (1) 及后文每个符号是否均已在表中定义？
 - [ ] **维度下标**：是否存在 `^{cpu}`、`^{mem}`、`^{io}` 等 **上标表示维度** 的写法？若有须改为 `b_{i,\mathrm{cpu}}`、`a_{j,\mathrm{mem}}` 等 **下标 + `\mathrm{}`** 形式（见 **`disclosure_builder.md` §7.7**）

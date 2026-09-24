@@ -109,8 +109,11 @@ Agent **落盘时**即采用上述命名，并在回复中写明路径，便于�
 
 ### 成文前：`formula_plan`（有公式时必做）
 
-1. **先扫材料**：编号公式、LaTeX、Word 公式、论文插式一律列入候选（出处 + 一句话在算什么）。对照 **已选专利点 / 3.3 / 3.4** 勾选进 `equations`；不采用的写入 `omitted`（`ref` + `reason`），禁止静默丢掉。  
-2. 在案件目录写出 **`formula_plan.yaml`**：每条式标记 **`origin: source`（材料转录）或 `origin: agent`（技能补写）**。source 填 `source_ref` 与原文 `latex`；只做分隔符等机械体例时把原材料写入 `original_latex`。**禁止**把材料公式改写成范式库模板。  
+1. **先扫材料**：扫描根内有 `.tex` 时：案件目录已有 **`tex_formula_inventory.md`** 则 **只 Read 该清单** 勾选，不必把 `.tex` 再载入成文上下文；无清单则按 **`prompts/tex_scan.md`** 补做。公式优先从源码/清单勾选。编号公式、Word 正文中的式、PDF 插式一律列入候选（出处 + 一句话在算什么）。对照 **已选专利点 / 3.3 / 3.4** 勾选进 `equations`；不采用的写入 `omitted`（`ref` + `reason`），禁止静默丢掉。  
+2. 在案件目录写出 **`formula_plan.yaml`**：每条式标记 **`origin: source`（材料转录）或 `origin: agent`（技能补写）**。source 填 `source_ref`、`source_kind`（`tex` / `md` / `word_text` / `pdf_text` / `other`）与原文 `latex`；只做分隔符等机械体例时把原材料写入 `original_latex`。**禁止**把材料公式改写成范式库模板。  
+   - 有 `.tex` 链则 `source_kind: tex`（默认已核）。  
+   - 仅从 `pdf_to_md` 文本层抄的式子：`source_kind: pdf_text`，`verified: false`。  
+   - **`verified: false` 的式子可写进 3.4.1 转述，不得当作 Fk / 创造性依据**；不因此停笔、不问用户补源码。  
 3. **仅当材料没有对应式** 才 `Read` `references/formulas/paradigms.yaml`（或 `python tools/formula_paradigms.py list [--case-dir …]`），为 agent 式选 `paradigm_id` / 可选 `combo_id`，并给 **可代入数值例**。  
 4. 校验：`python tools/check_formula_plan.py -i …/formula_plan.yaml --eval`；**不通过不得写 3.4.1**。简单 agent 式由脚本代入 `numeric_example`；source 复杂式脚本会跳过，须手算或从缺，**不得**为通过 `--eval` 降维改写。  
 5. 再写正文 3.4.1：只展开计划中的式。agent 起草的打分与限频触发宜分式 (1)/(2)。  
@@ -244,6 +247,8 @@ Word 公式主路径为 `latex2mathml` → 可编辑 OMML；失败则 **留 LaTe
 Step 5 已按 `prior_art_search.md`「D1 锁定与区别特征 Fk」落下 **`查新与区别定位_*.md`**（含门禁三态与证据级别）。审查骨架是 **口径唯一**（同一 Fk = 同一构造/机制），不是把 F1、F2 当成全文主语。
 
 内部定位稿用 D1/Fk 编号。交底正文要让发明人顺着读完、代理人仍能对上审查框架，**不必**把「唯一 D1」写成仪式性套话。过 / 带疑点过：点名最接近的一篇、给出选定理由、用技术维度对比即可，标签写「最接近的现有技术（D1）」。**不过**：见本节「降级成文」，**禁止**假 D1。
+
+`formula_plan` 里 **`verified: false`**（含默认的 `pdf_text`）的材料式**不得**单独当作 Fk。不因此中断成文。
 
 ### Fk 出场（正文可读性，硬项）
 
