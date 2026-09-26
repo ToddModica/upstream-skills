@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-25T20:45:53+00:00",
+  "generated_at": "2026-09-26T20:08:59+00:00",
   "user_excluded": [],
   "sources": [
     {
@@ -520,7 +520,7 @@
       "name": "shuorenhua",
       "upstream": "https://github.com/MrGeDiao/shuorenhua.git",
       "branch": "main",
-      "commit_sha": "77347b29994415b26e40e7a432d80cbc6fc8bdb8",
+      "commit_sha": "cd681637edb6000bde4b09f63e489a7012dd2a72",
       "local_snapshot_sha": "d9aaf100f23b1786c9345568ea652ac519ddcfbf",
       "upstream_subpath": null,
       "local_relative": "shuorenhua",
@@ -552,7 +552,7 @@
       "name": "design-taste-frontend",
       "upstream": "https://github.com/Leonxlnx/taste-skill.git",
       "branch": "main",
-      "commit_sha": "c184364c58658b2f131b4ae8bd3d206cabb3deee",
+      "commit_sha": "ce26fc25c0e5e8cab638f883de62d9a86ee5e45b",
       "local_snapshot_sha": "5cc15bbb98dfab8a5812b85971821fc9b93360a5",
       "upstream_subpath": "skills/taste-skill",
       "local_relative": "taste",
@@ -600,7 +600,7 @@
       "name": "remove-ai-marks",
       "upstream": "https://github.com/guillaumemeyer/watermarks-remover.git",
       "branch": "main",
-      "commit_sha": "6cbc0aeb0b9cd75777223b0df604f5db11940d00",
+      "commit_sha": "258cf20cdc2906e24398b3d6f3bc3cbcfd578245",
       "local_snapshot_sha": "a0dbbc8874d860a1f2ebe33498872eaf5d74ef58",
       "upstream_subpath": "skills/remove-ai-marks",
       "local_relative": null,
