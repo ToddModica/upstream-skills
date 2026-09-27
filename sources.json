@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-27T02:11:17+00:00",
+  "generated_at": "2026-09-27T20:24:47+00:00",
   "user_excluded": [],
   "sources": [
     {
@@ -456,7 +456,7 @@
       "name": "ppt-master",
       "upstream": "https://github.com/hugohe3/ppt-master.git",
       "branch": "main",
-      "commit_sha": "481e057ecd9f5ff094c9c789b17b2d1331e278e8",
+      "commit_sha": "680de11f1bef4628b68d5daad9dffec569fbd51f",
       "local_snapshot_sha": "0d3904a4ef72b8732d3d6ee23d500c21d2969425",
       "upstream_subpath": "skills/ppt-master",
       "local_relative": "ppt-master",
@@ -520,7 +520,7 @@
       "name": "shuorenhua",
       "upstream": "https://github.com/MrGeDiao/shuorenhua.git",
       "branch": "main",
-      "commit_sha": "cd681637edb6000bde4b09f63e489a7012dd2a72",
+      "commit_sha": "9e6400d5e2cc050485c38fbf0dda682bce66c180",
       "local_snapshot_sha": "d9aaf100f23b1786c9345568ea652ac519ddcfbf",
       "upstream_subpath": null,
       "local_relative": "shuorenhua",
