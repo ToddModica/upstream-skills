@@ -150,6 +150,45 @@ STEP_MAIN_REPLACEMENT = '''if __name__ == "__main__":
     # heap after CadQuery/OCP work and replace the real status with a crash code.
     os._exit(_exit_code)'''
 
+DEFENSIVE_WRITING_GUARDRAILS = {
+    "anti-defensive-writing": """## 研究诚信边界（优先规则）
+
+<!-- Marketplace integrity guardrail: anti-selective-reporting v1 -->
+
+证据完整性优先于叙事策略。突出优势不等于选择性报告：
+- 不隐去与核心主张相关的有效结果、反例、预设指标或必要对照，也不在看到结果后更换评价口径来回避不利发现。
+- 准确说明会影响结论解释范围的局限、不确定性和适用条件；主张强度必须与证据匹配。
+- 可压缩与研究问题无关的过程细节或附加分析，但不得以此隐藏重要结果；必要时说明筛选范围和理由。
+- 解释权衡或重新组织论文主线时，给出数据、设计或适用场景依据，不把不利证据改写成未经支持的优势。""",
+    "anti-defensive-writing-en": """## Research Integrity Guardrails (priority rule)
+
+<!-- Marketplace integrity guardrail: anti-selective-reporting v1 -->
+
+Evidence completeness takes priority over narrative strategy. A strength-focused paper is not selective reporting:
+- Do not omit valid results, counterexamples, prespecified metrics, or controls relevant to the research question or core claims; do not change evaluation criteria after seeing results to avoid unfavorable findings.
+- State limitations, uncertainty, and applicability conditions that affect interpretation. Match claim strength to the evidence.
+- Condense peripheral process detail or analyses unrelated to the research question when appropriate, and explain the selection scope when needed; do not use editing to hide material findings.
+- Explain trade-offs or restructure the narrative using evidence, study design, or applicability conditions. Do not recast unfavorable evidence as an unsupported advantage.""",
+}
+
+
+DEFENSIVE_WRITING_DESCRIPTIONS = {
+    "anti-defensive-writing": "适用于论文写作、修改、压缩、实验组织和审稿回复。围绕真实贡献组织清晰叙事，同时完整呈现与研究问题和核心主张相关的证据、结果及限制。关键词：论文润色、论文修改、摘要、引言、结论、rebuttal、实验组织、防御性写作。",
+    "anti-defensive-writing-en": "Use for academic writing, revision, concise editing, experiment organization, and reviewer responses. Build a clear narrative around genuine contributions while reporting evidence, results, and limitations relevant to the research question and core claims. Triggers: manuscript revision, abstract, introduction, conclusion, rebuttal, experiment organization, defensive writing.",
+}
+
+def set_skill_description(path: Path, description: str) -> None:
+    lines = path.read_text(encoding="utf-8").splitlines()
+    try:
+        end = lines.index("---", 1)
+        start = next(i for i, line in enumerate(lines[:end]) if line.startswith("description:"))
+    except (ValueError, StopIteration) as error:
+        raise RuntimeError(f"{path}: could not locate YAML description") from error
+    stop = start + 1
+    while stop < end and (lines[stop] == "" or lines[stop].startswith(" ") or lines[stop].startswith(chr(9))):
+        stop += 1
+    lines[start:stop] = ["description: >", f"  {description}"]
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 def _patch_skill_text(path: Path, anchor: str, replacement: str, marker: str, label: str) -> None:
     text = path.read_text(encoding="utf-8")
@@ -186,6 +225,14 @@ def apply_patent_disclosure_skill_overrides(target: Path) -> None:
 
 
 def apply_marketplace_overrides(name: str, target: Path) -> None:
+    if name in DEFENSIVE_WRITING_GUARDRAILS:
+        skill = target / "SKILL.md"
+        set_skill_description(skill, DEFENSIVE_WRITING_DESCRIPTIONS[name])
+        text = skill.read_text(encoding="utf-8")
+        marker = "<!-- Marketplace integrity guardrail: anti-selective-reporting v1 -->"
+        if marker not in text:
+            skill.write_text(text.rstrip() + "\n\n" + DEFENSIVE_WRITING_GUARDRAILS[name] + "\n", encoding="utf-8")
+        return
     if name == "patent-disclosure-skill":
         apply_patent_disclosure_skill_overrides(target)
         return

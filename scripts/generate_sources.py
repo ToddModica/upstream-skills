@@ -30,7 +30,7 @@ INCLUDED = {
         "scipilot-figure-skill",
         "scipilot-writing-skill",
     },
-    "writing-toolkit": {"ai-flavor-remover", "humanizer", "humanizer-zh", "shuorenhua", "stop-slop"},
+    "writing-toolkit": {"ai-flavor-remover", "humanizer", "humanizer-zh", "shuorenhua", "stop-slop", "anti-defensive-writing", "anti-defensive-writing-en"},
     "codex-utility-toolkit": {
         "bilibili-page-reader",
         "design-taste-frontend",

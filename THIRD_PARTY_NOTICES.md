@@ -17,6 +17,7 @@
 | Humanizer-zh | https://github.com/op7418/Humanizer-zh | MIT | writing-toolkit |
 | shuorenhua | https://github.com/MrGeDiao/shuorenhua | MIT | writing-toolkit |
 | stop-slop | https://github.com/hardikpandya/stop-slop | MIT | writing-toolkit |
+| Anti-Defensive Writing (Chinese and English) | https://github.com/Adkid-Zephyr/anti-defensive-writing-Skill | MIT | writing-toolkit |
 | No Negative Echo | https://github.com/LB623/no-negative-echo | MIT | no-negative-echo |
 | Taste Skill | https://github.com/Leonxlnx/taste-skill | MIT | codex-utility-toolkit |
 | PPT Master | https://github.com/hugohe3/ppt-master | MIT | codex-utility-toolkit |

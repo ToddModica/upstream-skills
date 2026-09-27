@@ -17,7 +17,7 @@ Tavotto 通过其官方 `plugin-stable` 分支按需拉取，许可证为 **AGPL
 - Academic Research：[`academic-paper`、`academic-paper-reviewer`、`academic-pipeline`、`deep-research`](https://github.com/Imbad0202/academic-research-skills)；[`academic-research-suite`](https://github.com/Imbad0202/academic-research-skills-codex)。
 - Nature：[`nature-*` 九个工作流](https://github.com/Yuan1z0825/nature-skills)。
 - 专利与 SciPilot：[`patent-disclosure-skill`](https://github.com/handsomestWei/patent-disclosure-skill)；[`scipilot-cite-skill`](https://github.com/Haojae/scipilot-cite-skill)、[`scipilot-figure-skill`](https://github.com/Haojae/scipilot-figure-skill)、[`scipilot-writing-skill`](https://github.com/Haojae/scipilot-writing-skill)。
-- 写作：[`humanizer`](https://github.com/blader/humanizer)、[`humanizer-zh`](https://github.com/op7418/Humanizer-zh)、[`shuorenhua`](https://github.com/MrGeDiao/shuorenhua)、[`stop-slop`](https://github.com/hardikpandya/stop-slop)。
+- 写作：[`humanizer`](https://github.com/blader/humanizer)、[`humanizer-zh`](https://github.com/op7418/Humanizer-zh)、[`shuorenhua`](https://github.com/MrGeDiao/shuorenhua)、[`stop-slop`](https://github.com/hardikpandya/stop-slop)、[`anti-defensive-writing`（中文）与 `anti-defensive-writing-en`（英文）](https://github.com/Adkid-Zephyr/anti-defensive-writing-Skill)。
 - 开发与文档：[`bilibili-page-reader`、`powershell-safe-invocation`](https://github.com/Misaka-Mikoto-Tech/agent-skills)、[`design-taste-frontend`](https://github.com/Leonxlnx/taste-skill)、[`ppt-master`](https://github.com/hugohe3/ppt-master)、[`grilling`](https://github.com/mattpocock/skills)。
 - 插件与 MCP：[`ponytail`](https://github.com/DietrichGebert/ponytail)、[`watermarks-remover`](https://github.com/guillaumemeyer/watermarks-remover)、[`no-negative-echo`](https://github.com/LB623/no-negative-echo)、[`itasca-mcp`](https://github.com/yusong652/itasca-mcp)、[`Tavotto`](https://github.com/Tavotto/Tavotto)。Tavotto 的插件来源固定为上游 `plugin-stable` 发布分支。
 - CAD 运行时：专利工具的 STEP/SVG 处理使用 [`CadQuery`](https://github.com/CadQuery/cadquery)。
@@ -65,6 +65,10 @@ codex plugin add tavotto@research-toolkit-marketplace
 - `humanizer-zh`
 - `shuorenhua`
 - `stop-slop`
+- `anti-defensive-writing`（中文）
+- `anti-defensive-writing-en`（英文）
+
+可显式调用 `$anti-defensive-writing` 或 `$anti-defensive-writing-en`。撰写或修改论文摘要、引言、结论、实验叙事、论文压缩及审稿回复时，也会按 Skill 描述自动匹配；建议里要求围绕真实贡献组织叙事，并保留与核心主张相关的结果和限制。
 
 ### codex-utility-toolkit
 

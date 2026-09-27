@@ -1,15 +1,15 @@
 {
   "name": "writing-toolkit",
-  "version": "0.1.22",
-  "description": "Chinese and English prose editing skills with natural-language style checks.",
+  "version": "0.1.23",
+  "description": "Chinese and English prose editing, natural-language style checks, and evidence-aligned academic narrative guidance.",
   "author": {
     "name": "research-toolkit maintainers"
   },
   "skills": "./skills/",
   "interface": {
     "displayName": "Writing Toolkit",
-    "shortDescription": "Natural Chinese and English prose editing.",
-    "longDescription": "Contains MIT-licensed editing skills for removing repetitive or artificial wording while preserving meaning.",
+    "shortDescription": "Evidence-aligned academic narratives and clear Chinese and English prose.",
+    "longDescription": "Contains writing and editing skills for natural phrasing, evidence-aligned academic narratives, and clear prose while preserving research reporting.",
     "developerName": "research-toolkit maintainers",
     "category": "Writing",
     "capabilities": [
@@ -17,7 +17,8 @@
     ],
     "defaultPrompt": [
       "Make this text sound more natural without changing facts.",
-      "Identify repetitive AI-style wording in this draft."
+      "Identify repetitive AI-style wording in this draft.",
+      "Organize this manuscript around its strongest evidence while reporting material results and limitations."
     ]
   }
 }

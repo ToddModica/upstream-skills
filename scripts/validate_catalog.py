@@ -31,7 +31,7 @@ REQUIRED_SKILLS = {
         "scipilot-figure-skill",
         "scipilot-writing-skill",
     },
-    "writing-toolkit": {"humanizer", "humanizer-zh", "shuorenhua", "stop-slop"},
+    "writing-toolkit": {"humanizer", "humanizer-zh", "shuorenhua", "stop-slop", "anti-defensive-writing", "anti-defensive-writing-en"},
     "no-negative-echo": {"no-negative-echo"},
     "codex-utility-toolkit": {
         "bilibili-page-reader",
@@ -122,6 +122,10 @@ def main() -> None:
             expected_target = f"plugins/{plugin}/skills/{name}"
             if not item or item.get("action") != "copy" or item.get("target") != expected_target:
                 fail(f"{name}: source lock does not enable automatic copy into {plugin}")
+            if name in {"anti-defensive-writing", "anti-defensive-writing-en"}:
+                text = (ROOT / expected_target / "SKILL.md").read_text(encoding="utf-8")
+                if "<!-- Marketplace integrity guardrail: anti-selective-reporting v1 -->" not in text:
+                    fail(f"{name}: marketplace integrity guardrail is missing")
             if item.get("license_scope") == "repository-root":
                 license_path = ROOT / expected_target / "UPSTREAM_LICENSE"
                 if not license_path.is_file():
