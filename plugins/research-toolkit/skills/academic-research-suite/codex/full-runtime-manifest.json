@@ -915,6 +915,50 @@
       "runner": "upstream:ars/scripts/test_build_calibration_measurement_row.py",
       "parity": "partial",
       "execution": "hermetic"
+    },
+    {
+      "id": "v3222_routing_core_sync",
+      "kind": "routing",
+      "runner": "upstream:ars/scripts/check_routing_core_sync.py",
+      "parity": "near"
+    },
+    {
+      "id": "v3222_command_skill_dispatch",
+      "kind": "routing",
+      "runner": "upstream:ars/scripts/check_command_skill_dispatch.py",
+      "parity": "near"
+    },
+    {
+      "id": "v3222_skill_description_length",
+      "kind": "packaging",
+      "runner": "upstream:ars/scripts/check_skill_description_length.py",
+      "parity": "near"
+    },
+    {
+      "id": "v3222_instruction_data_boundary",
+      "kind": "integrity",
+      "runner": "upstream:ars/scripts/check_instruction_data_boundary.py",
+      "parity": "near"
+    },
+    {
+      "id": "v3222_run_ledger",
+      "kind": "integrity",
+      "runner": "upstream:ars/scripts/test_run_ledger.py",
+      "parity": "near",
+      "execution": "hermetic"
+    },
+    {
+      "id": "v3222_check_acronyms",
+      "kind": "integrity",
+      "runner": "upstream:ars/scripts/test_check_acronyms.py",
+      "parity": "near",
+      "execution": "hermetic"
+    },
+    {
+      "id": "v3222_root_router_contract",
+      "kind": "routing",
+      "runner": "root-router",
+      "parity": "near"
     }
   ],
   "known_degradations": [
@@ -929,6 +973,9 @@
     "Claude agent tools allowlists are preserved as least-privilege role boundaries, but actual Codex tool availability remains controlled by the active runtime and task permissions.",
     "Unlike upstream script-backed pipeline wiring, an ars-full request in ARS-Codex does not by itself launch the four bibliographic resolver clients. Programmatic citation verification remains explicit, while mandatory integrity checkpoints use the default Codex browsing route unless separately authorized.",
     "The v3.21.1 research-workflow profile substrate has no automatic planner or pipeline hook, and the inquiry branch ledger remains disabled unless ARS_INQUIRY_LEDGER=1 is explicitly selected; neither metadata surface creates runtime authority.",
-    "The vendored snapshot preserves sealed promotion-bakeoff contracts, audit artifacts, and hermetic tests, but cannot independently re-prove upstream seal/reveal chronology because it does not contain the complete canonical upstream Git history."
+    "The vendored snapshot preserves sealed promotion-bakeoff contracts, audit artifacts, and hermetic tests, but cannot independently re-prove upstream seal/reveal chronology because it does not contain the complete canonical upstream Git history.",
+    "The v3.22.2 routing core is embedded in the single registered Codex router and core WORKFLOW.md files; the upstream Claude SessionStart announce remains inactive. Static routing tests and byte equality are not live-model activation measurements.",
+    "The v3.22.2 run ledger depends on the calling session recording exact user wording, tool receipts, counters, and paths. Missing or stale provenance cannot support an affected decision or step; hashes do not establish semantic completeness or resist deliberate rewriting or rollback.",
+    "The v3.22.2 acronym checker reports advisory coverage over saved drafts and abstracts. Its final review attachment is outside editorial decisions, revision roadmaps, re-review criteria, and integrity gates; unavailable or partial output is not a clean result."
   ]
 }

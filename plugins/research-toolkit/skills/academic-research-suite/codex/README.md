@@ -82,7 +82,7 @@ Instead it provides an explicit Codex orchestration contract:
   `medium` for routine work and `xhigh` for complex judgement, preserves explicit
   choices, and distinguishes requested settings from observed execution;
   upstream `sonnet` hints do not select a Codex model;
-- ARS v3.22.0 retains model tiering as advisory metadata; it is applied only
+- ARS v3.22.2 retains model tiering as advisory metadata; it is applied only
   when a Codex runtime provides explicit per-dispatch model selection;
 - canonical cross-model handoffs are validated and transported by the
   dispatching context, not by least-privilege owner roles;

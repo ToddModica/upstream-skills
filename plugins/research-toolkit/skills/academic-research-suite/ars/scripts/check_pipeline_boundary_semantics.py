@@ -11,7 +11,7 @@ drift class the #491 lock closed for the Bucket A enforcement sentence.
 Pinned invariants (one per replay item):
 
 1. **Methodology Blueprint in the Stage 1→2 handoff** — all three handoff
-   surfaces (SKILL.md Step 4 list, state-machine transition row, orchestrator
+   surfaces (WORKFLOW.md Step 4 list, state-machine transition row, orchestrator
    handoff table) carry the Blueprint alongside RQ Brief / Bibliography /
    Synthesis.
 
@@ -21,19 +21,19 @@ Pinned invariants (one per replay item):
 3. **Stage 5 boundary semantics** — the MANDATORY finalization boundary is the
    Stage 5 ENTRY gate (between Stage 4.5 PASS and the Stage 5 dispatch); the
    Stage 5 completion checkpoint is FULL — never SLIM. Authority section in
-   the state machine + mirrored canonical fragments in SKILL.md and the
+   the state machine + mirrored canonical fragments in WORKFLOW.md and the
    orchestrator + the completion-checkpoint transition row.
 
 4. **Stage 6 terminal semantics** — the state machine defines Stage 6, the
    decline path, the terminal checkpoint, and the acknowledgement vocabulary
-   (finish / end / done / confirm + natural-language equivalent); SKILL.md,
+   (finish / end / done / confirm + natural-language equivalent); WORKFLOW.md,
    the orchestrator, and process_summary_protocol.md carry the vocabulary;
    the orchestrator wires the terminal state_tracker transition.
 
 Falsifiability discipline (per feedback_lint_passes_but_prompt_silent.md):
 the state-machine authority fragments are scoped to the § Stage 5 and Stage 6
 Boundary Semantics H2 span via the shared `check_section_literals` — the same
-fragment appearing elsewhere in the file does not count. The SKILL.md /
+fragment appearing elsewhere in the file does not count. The WORKFLOW.md /
 orchestrator mirror fragments are file-unique canonical sentences and are
 deliberately pinned file-wide.
 
@@ -70,10 +70,10 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 # reviewed against the #528 resolutions.
 # ---------------------------------------------------------------------------
 CONTENT_LOCKS = {
-    "academic-pipeline/WORKFLOW.md": "ba053aef5fd9162bccb0e7057623451a7ec0e249c9fa5cc0e92d337699cb4a52",
-    "academic-pipeline/agents/pipeline_orchestrator_agent.md": "5fa5083ad58f485eefc59034d4916ec3a91289c2899885d5fbcf460cd8ba864f",
-    "academic-pipeline/agents/state_tracker_agent.md": "2716bab5686a6129777f595ad86bf1e1cc01fa5d8d1ec192fa8880018dfe968a",
-    "academic-pipeline/references/pipeline_state_machine.md": "6ef7703d3b24152812c5767570f36f01578846383cb9fd2d42bc8f79084e57ae",
+    "academic-pipeline/WORKFLOW.md": "bf5bf907b37e625b1bd75f74b44c77443e618cdc7153a19d2a7319f562f8d9d7",
+    "academic-pipeline/agents/pipeline_orchestrator_agent.md": "2ec9c094fbc59686ab481be191ebae98a5f70f3dc718433333252432567d162f",
+    "academic-pipeline/agents/state_tracker_agent.md": "787b994b727235451ca885f5be51ce3590dca9fd7134c66f38ba6ac4287eca26",
+    "academic-pipeline/references/pipeline_state_machine.md": "54db2063cd673fa02b76c4822317790c026db078d1a2195d5e5b7cbb40ca1241",
     "academic-pipeline/references/process_summary_protocol.md": "1052d8cb8ee00c1cd0fcc70a18aee5a0f92db2ebe0a74930b04d4b05d888cfdf",
 }
 

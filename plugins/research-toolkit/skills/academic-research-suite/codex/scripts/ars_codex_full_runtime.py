@@ -22,7 +22,8 @@ CODEX_ROOT = SCRIPT.parents[1]
 SUITE_ROOT = SCRIPT.parents[2]
 MANIFEST_PATH = CODEX_ROOT / "full-runtime-manifest.json"
 
-ALIAS_RE = re.compile(r"(?<![\w/-])(/?ars-[a-z0-9-]+)(?![\w-])", re.IGNORECASE)
+ALIAS_RE = re.compile(r"^\s*(?:(?:use\s+)?\$academic-research-suite[\s.,:;]+)?(/?ars-[a-z0-9-]+)(?![\w-])", re.IGNORECASE)
+DIRECT_MODE_RE = re.compile(r"^\s*\[direct-mode\]\s*", re.IGNORECASE)
 QUESTION_RE = re.compile(
     r"\b(research question|rq|hypothesis|hypotheses|pregunta de investigación|hipótesis)\b|研究問題|研究问题|假設|假设|연구 질문|연구 문제|가설",
     re.IGNORECASE,
@@ -64,13 +65,6 @@ VAGUE_TOPIC_PATTERNS = (
     "tema de investigación",
 )
 
-ALIAS_SOC_OVERRIDE = {
-    "ars-plan",
-    "ars-outline",
-    "ars-abstract",
-    "ars-lit-review",
-    "ars-full",
-}
 
 REVIEWER_ORDER = [
     "field_analyst_agent.md",
@@ -168,7 +162,7 @@ def command_by_alias(manifest: dict[str, Any], alias: str | None) -> dict[str, A
 
 
 def find_alias(request: str) -> str | None:
-    match = ALIAS_RE.search(request)
+    match = ALIAS_RE.match(request)
     if not match:
         return None
     return canonical_alias(match.group(1))
@@ -184,8 +178,28 @@ def is_vague_paper_topic(request: str) -> bool:
 
 def infer_natural_route(request: str) -> tuple[str, str, str]:
     lowered = request.lower()
-    if is_vague_paper_topic(request):
-        return "deep-research", "socratic", "paper_topic_scoping_override"
+    if any(signal in lowered for signal in (
+        "academic pipeline", "research to paper", "full pipeline", "full research-to-paper",
+        "flujo de trabajo académico", "investigación a artículo",
+        "pipeline de artículo completo", "flujo completo de investigación-publicación",
+        "연구부터 논문까지", "논문 전체 워크플로", "完整研究到論文流程", "完整論文流程",
+    )):
+        return "academic-pipeline", "pipeline", "natural_pipeline_request"
+    # Explicit modes retain their route even without the usual inputs (#889).
+    if re.search(r"(?:檢查|核對|检查|核对)[^\n。？！]{0,40}(?:引用|參考文獻|参考文献|文獻|文献)|\b(?:check|verify|audit)\s+(?:(?:my|the|these|this)\s+)?(?:citations?|references?|refs)\b|\bcitation[- ]check\b|look over the refs|檢查引用|引用檢查|檢查參考文獻|核對文獻|检查引用|引用检查|检查参考文献|核对文献|인용 확인|인용 형식 검사", lowered):
+        return "academic-paper", "citation-check", "natural_citation_request"
+    if re.search(r"\b(?:write|draft)\s+(?:(?:an?|the|my|bilingual)\s+)*abstract\b|撰寫摘要|撰写摘要|寫摘要|写摘要", lowered):
+        return "academic-paper", "abstract-only", "natural_abstract_request"
+    if re.search(r"\b(?:revise|improve|polish)\s+(?:(?:this|the|my|our)\s+)*(?:paper|draft|manuscript|article)\b|修改論文|修訂論文|修改论文|修订论文", lowered):
+        return "academic-paper", "revision", "natural_revision_request"
+    if re.search(r"\b(?:revision roadmap|parse reviews|reviewer[- ]response coaching)\b|我收到審查意見|修訂路線圖", lowered):
+        return "academic-paper", "revision-coach", "natural_revision_coach_request"
+    if re.search(r"(?<![\w/-])(?:run\s+)?lit-review(?![\w-])", lowered):
+        return "academic-paper", "lit-review", "natural_paper_literature_request"
+    if re.search(r"\b(?:draft|write|create)\s+(?:(?:a|an|the|my|paper)\s+)*outline\b|撰寫大綱|撰写大纲", lowered):
+        return "academic-paper", "outline-only", "natural_outline_request"
+    if re.search(r"\bplan\s+(?:(?:a|the|my|this)\s+)*(?:paper|manuscript)\b|論文規劃|论文规划", lowered):
+        return "academic-paper", "plan", "natural_plan_request"
     # Spanish uses intent-specific compounds, preserving the upstream boundary
     # between editing one's draft and reviewing a submitted manuscript.
     if re.search(r"\b(?:enmendar|enmienda)\s+mi\s+artículo\b", lowered):
@@ -231,8 +245,8 @@ def infer_natural_route(request: str) -> tuple[str, str, str]:
     if any(
         signal in lowered
         for signal in (
-            "reviewer",
-            "peer review",
+            "simulate peer review",
+            "peer review simulation",
             "논문을 심사",
             "논문 심사",
             "동료 심사",
@@ -248,8 +262,111 @@ def infer_natural_route(request: str) -> tuple[str, str, str]:
         return "academic-paper", "revision", "natural_revision_request"
     if "초록 작성" in lowered:
         return "academic-paper", "abstract-only", "natural_abstract_request"
+    if is_vague_paper_topic(request):
+        return "deep-research", "socratic", "paper_topic_scoping_override"
     return "academic-paper", "plan", "default_academic_planning"
 
+
+
+def intent_text(request: str) -> str:
+    """Exclude quoted/fenced material and labeled artifact payloads from triggers.
+
+    This is a conservative text planner, not a semantic injection detector. The
+    calling session must still classify unlabeled third-party material as data.
+    """
+    lines = []
+    fence = None
+    for line in request.splitlines():
+        if fence:
+            if re.fullmatch(rf" {{0,3}}{re.escape(fence[0])}{{{len(fence)},}}\s*", line):
+                fence = None
+            continue
+        opening = re.match(r"^ {0,3}(`{3,}|~{3,})", line)
+        if opening:
+            fence = opening.group(1)
+        elif not re.match(r"^\s*>", line):
+            lines.append(line)
+    text = "\n".join(lines)
+    text = re.sub(r'"[^"\n]*"|“[^”]*”|「[^」]*」|『[^』]*』', "", text)
+    text = re.split(
+        r"(?im)^\s*(?:#{1,6}\s+|\*\*)?"
+        r"(?:abstract(?: draft)?|full draft|literature collection|reviewer feedback|"
+        r"manuscript text|摘要|全文|文獻清單|审稿意见|審查意見)\s*(?:\([^\n]*?\))?\s*[:：]",
+        text,
+        maxsplit=1,
+    )[0]
+    # Inline code names an artifact or an example, not a mode invocation.
+    return re.sub(r"`[^`]*`", "", text)
+
+
+def has_cross_phase_materials(request: str) -> bool:
+    patterns = (
+        r"\babstract(?: draft)?\b|摘要",
+        r"\b(?:full draft|manuscript attached|draft attached|draft_v\d|draft[- ]v\d)\b|完整草稿|全文草稿",
+        r"\b(?:collected.{0,35}papers|literature collection|literature review|bibliography|\d+\s+(?:papers|pdfs))\b|文獻清單|參考文獻|参考文献",
+        r"\b(?:reviewer (?:comments|feedback)|decision letter)\b|審查意見|审稿意见",
+    )
+    return sum(bool(re.search(pattern, request, re.IGNORECASE)) for pattern in patterns) >= 2
+
+
+def direct_target(request: str, manifest: dict[str, Any]) -> tuple[str, str | None] | None:
+    """Resolve only a named workflow or an unambiguous named role after the token."""
+    named_workflows = [name for name in manifest["workflows"] if re.search(
+        rf"(?<![\w-]){re.escape(name)}(?![\w-])", request
+    )]
+    candidates = []
+    for workflow, config in manifest["workflows"].items():
+        if named_workflows and workflow not in named_workflows:
+            continue
+        for filename in config.get("agent_prompts", []):
+            if re.search(rf"\b{re.escape(Path(filename).stem)}\b", request):
+                candidates.append((workflow, filename))
+    if len(candidates) == 1:
+        return candidates[0]
+    if not candidates and len(named_workflows) == 1:
+        return named_workflows[0], None
+    return None
+
+
+def clarification_plan(manifest, profile, request, reason, direct_mode):
+    """No executable route or topology exists until the user settles intent."""
+    return {
+        "adapter": manifest["adapter"]["name"],
+        "profile": profile,
+        "routing_status": "clarification_required",
+        "route_reason": reason,
+        "dispatch_request": request,
+        "direct_mode_honored": direct_mode,
+        "direct_agent_path": None,
+        "command_alias": None,
+        "command_recipe": None,
+        "workflow": None,
+        "mode": None,
+        "workflow_path": None,
+        "required_read_paths": ["ars/shared/references/intent_clarification_protocol.md"],
+        "required_read_status": "caller_must_read_before_execution",
+        "model_hint": None,
+        "model_plan": None,
+        "stop_at_checkpoint": None,
+        "agent_template": None,
+        "agent_team_plan": [],
+        "topology_plan": {
+            "schema": "ars.codex.topology-plan.v1",
+            "arm_id": None,
+            "selection": {"source": "routing_clarification", "automatic": False},
+            "applicable": False,
+            "scope": "clarification_only",
+            "nodes": [],
+            "edges": [],
+            "information_sharing": {},
+            "execution_blocked": True,
+            "reason_codes": [reason],
+        },
+        "quality_gates": [],
+        "quality_gate_scope": "package_validation_catalog",
+        "quality_gates_execute_on_request": False,
+        "degraded_behavior": [],
+    }
 
 def detect_checkpoint(request: str, workflow: str) -> str | None:
     if workflow != "academic-pipeline":
@@ -732,32 +849,77 @@ def build_agent_plan(manifest: dict[str, Any], workflow: str, mode: str, profile
     return agent_plan_from_topology(build_topology_plan(workflow, mode, profile))
 
 
-def plan_request(request: str, env: dict[str, str] | None = None) -> dict[str, Any]:
+def plan_request(
+    request: str, env: dict[str, str] | None = None, *, first_message: bool = True,
+) -> dict[str, Any]:
+    """Plan a new request; callers must not re-route a settled run on resume.
+
+    Set first_message=False for later requests in a conversation, where the
+    [direct-mode] escape hatch has no authority. This planner has no transcript.
+    """
     env = os.environ if env is None else env
     manifest = load_manifest()
     profile = profile_from_env(env)
+    direct_match = DIRECT_MODE_RE.match(request) if first_message else None
+    direct_mode = direct_match is not None
+    request = request[direct_match.end():].strip() if direct_match else request.strip()
     alias = find_alias(request)
     command = command_by_alias(manifest, alias)
     route_reason = "alias_router" if command else "natural_language_router"
+    direct_agent = None
+    text = intent_text(request)
+    target = direct_target(text, manifest) if direct_mode else None
 
     if command:
         workflow = command["workflow"]
         mode = command["mode"]
         recipe = command["recipe"]
         model_hint = command["model_hint"]
-        if canonical_alias(alias) in ALIAS_SOC_OVERRIDE and is_vague_paper_topic(request):
-            workflow = "deep-research"
-            mode = "socratic"
-            route_reason = "paper_topic_scoping_override"
+        request = ALIAS_RE.sub("", request, count=1).strip()
+    elif target:
+        workflow, direct_agent = target
+        mode = "direct-agent" if direct_agent else (
+            "pipeline" if workflow == "academic-pipeline" else "full"
+        )
+        if not direct_agent:
+            named_modes = [candidate for candidate in manifest["workflows"][workflow]["modes"]
+                           if re.search(rf"(?<![\w-]){re.escape(candidate)}(?![\w-])", text, re.IGNORECASE)]
+            if len(named_modes) == 1:
+                mode = named_modes[0]
+        recipe = model_hint = None
+        route_reason = "direct_mode_named_agent" if direct_agent else "direct_mode_named_workflow"
     else:
-        workflow, mode, route_reason = infer_natural_route(request)
-        recipe = None
-        model_hint = None
+        workflow, mode, route_reason = infer_natural_route(text)
+        recipe = model_hint = None
+        implicit = route_reason in {"default_academic_planning", "paper_topic_scoping_override"}
+        if route_reason == "natural_research_request" and has_cross_phase_materials(request):
+            implicit = not bool(re.search(
+                r"\b(?:run|conduct|perform|complete|finish|plan|prepare|write|do|haz)\b.{0,50}"
+                r"(?:review|revisión|metaanálisis)|^(?:systematic review|literature review|revisión sistemática)|"
+                r"(?:請|请|進行|进行|完成).{0,20}(?:文獻回顧|文献综述)", text, re.IGNORECASE,
+            ))
+        if implicit and not direct_mode and has_cross_phase_materials(request):
+            return clarification_plan(manifest, profile, request, "cross_phase_materials_require_clarification", direct_mode)
+        if implicit and (direct_mode or not (
+            is_vague_paper_topic(text) or QUESTION_RE.search(text)
+            or re.search(r"\b(?:plan|outline|preview|write)\b.{0,35}\b(?:paper|article|outline)\b|論文規劃|论文规划|quiero escribir un artículo", text, re.IGNORECASE)
+        )):
+            return clarification_plan(manifest, profile, request, "ambiguous_intent_requires_clarification", direct_mode)
 
     workflow_config = manifest["workflows"][workflow]
     model_plan = build_model_plan(manifest, workflow, mode, env)
     checkpoint = detect_checkpoint(request, workflow)
-    topology_plan = build_topology_plan(workflow, mode, profile)
+    topology_profile = profile
+    if direct_agent:
+        # A named role must not widen into the containing workflow's whole team.
+        topology_profile = {**profile, "agent_team_enabled": False, "topology_experiment_enabled": False}
+    topology_plan = build_topology_plan(workflow, mode, topology_profile)
+    if direct_agent:
+        topology_plan["scope"] = "direct_agent_only"
+        node = topology_plan["nodes"][0]
+        node.update({"agent": Path(direct_agent).stem,
+                     "prompt_path": prompt_path(workflow, direct_agent),
+                     "emits": ["direct_agent_result"]})
     if profile["agent_team_enabled"] or profile["topology_experiment_enabled"]:
         agent_plan = agent_plan_from_topology(topology_plan)
     else:
@@ -793,9 +955,25 @@ def plan_request(request: str, env: dict[str, str] | None = None) -> dict[str, A
                 )
     gates = [gate for gate in manifest["quality_gates"] if gate["kind"] in {"routing", "agent-team", "integrity", "material-passport"}]
 
+    required_reads = [workflow_config["workflow_path"]]
+    if recipe:
+        required_reads.insert(0, recipe)
+    if direct_agent:
+        required_reads.append(prompt_path(workflow, direct_agent))
+    if workflow == "academic-paper" and mode == "citation-check":
+        required_reads.append("ars/academic-paper/agents/citation_compliance_agent.md")
+        if re.search(r"Chinese|中文|漢字|汉字|중국어", request, re.IGNORECASE):
+            required_reads.append("ars/academic-paper/references/apa7_chinese_citation_guide.md")
+
     return {
         "adapter": manifest["adapter"]["name"],
         "profile": profile,
+        "routing_status": "routed",
+        "dispatch_request": request,
+        "direct_mode_honored": direct_mode,
+        "direct_agent_path": prompt_path(workflow, direct_agent) if direct_agent else None,
+        "required_read_paths": required_reads,
+        "required_read_status": "caller_must_read_before_execution",
         "command_alias": alias,
         "command_recipe": recipe,
         "workflow": workflow,
@@ -805,7 +983,7 @@ def plan_request(request: str, env: dict[str, str] | None = None) -> dict[str, A
         "model_hint": model_hint,
         "model_plan": model_plan,
         "stop_at_checkpoint": checkpoint,
-        "agent_template": workflow_config.get("agent_template"),
+        "agent_template": None if direct_agent else workflow_config.get("agent_template"),
         "agent_team_plan": agent_plan,
         "topology_plan": topology_plan,
         "quality_gates": gates,
@@ -820,6 +998,7 @@ def main() -> int:
     parser.add_argument("request", nargs="*", help="User request to route")
     parser.add_argument("--request-file", type=Path, help="Read request text from file")
     parser.add_argument("--pretty", action="store_true", help="Pretty-print JSON")
+    parser.add_argument("--not-first-message", action="store_true", help="Disable the first-message-only direct-mode escape hatch")
     args = parser.parse_args()
 
     if args.request_file:
@@ -827,7 +1006,7 @@ def main() -> int:
     else:
         request = " ".join(args.request)
     try:
-        result = plan_request(request)
+        result = plan_request(request, first_message=not args.not_first_message)
     except ValueError as exc:
         parser.error(str(exc))
     print(json.dumps(result, ensure_ascii=False, indent=2 if args.pretty else None, sort_keys=args.pretty))
