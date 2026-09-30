@@ -81,3 +81,7 @@ python skills/patent-search/tools/cnipa_search.py \
 - `inventor_query_only_unverified_namesake` → “仅姓名查询命中，同名归属待核实”
 
 机读前缀：`EPUB_SEARCH_MD:` / `EPUB_SEARCH_JSON:`（stdout）、`EPUB_SEARCH_NOTE:` / `EPUB_SEARCH_INCOMPLETE:`（stderr）。面向用户给 Markdown 路径和中文摘要，不要只倒 JSON 键。
+
+## 按特征精排（可选旁路）
+
+用户点名或对照表派工时，`Read` `prompts/covers_rank.md`。用命中摘要对 Fk 打 `covers_feature`，经 `emit_covers_report.py` 另写 `SEARCH-*.covers.md` / `.covers.json`。**禁止**改写本次 `SEARCH-*.md` 列表。无点名不要生成 covers。

@@ -159,9 +159,16 @@
 <tr>
 <td nowrap><a href="skills/patent-oa/README.md"><code style="white-space:nowrap">patent-oa</code></a></td>
 <td nowrap>审查答复辅助</td>
-<td>审查意见别对着发懵：拆条款问答、起草答复稿；个人从业经验和实务书专家技巧蒸馏进库，RAG 检索增强辅助答复</td>
+<td>审查意见别对着发懵：拆条款问答、起草答复稿；可把历史案脱敏进库，对照旧打法辅助答复</td>
 <td>「审查答复」· 「审查意见」</td>
 <td nowrap><a href="skills/patent-oa/README.md">详情</a></td>
+</tr>
+<tr>
+<td nowrap><a href="skills/patent-chart/README.md"><code style="white-space:nowrap">patent-chart</code></a></td>
+<td nowrap>权利要求对照表</td>
+<td>把独权拆成特征格，和对比文件 / 产品 / 标准逐格填证据与强弱；主交付 Excel，不构成法律意见</td>
+<td>「对照表」· 「claim chart」</td>
+<td nowrap><a href="skills/patent-chart/README.md">详情</a></td>
 </tr>
 <tr>
 <td nowrap><a href="skills/patent-search/README.md"><code style="white-space:nowrap">patent-search</code></a></td>

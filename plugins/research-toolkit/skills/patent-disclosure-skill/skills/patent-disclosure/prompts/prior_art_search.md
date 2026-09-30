@@ -75,11 +75,10 @@
    python skills/patent-disclosure/tools/browser.py --probe
    ```
 
-   - **禁止**把 `pip install` / `python -m playwright install chromium` 写进每次检索的默认命令。
    - `--probe` 的 stdout JSON：`playwright=false` 时**本会话最多一次** `pip install playwright`（或 `pip install -r requirements.txt`），再 `--probe`。
-   - `ok=true`（已有 Chrome / Edge / 自带 Chromium）→ **直接检索**，**禁止** `playwright install chromium`。
+   - `ok=true`（已有 Chrome / Edge / 自带 Chromium）→ **直接检索**。
    - `ok=false` 且已有 Playwright 包、本机无 Chrome/Edge 时，才允许**一次** `python -m playwright install chromium`，然后再检索。
-   - 探测或启动仍失败 → 进入 **B**（WebSearch），不要反复安装。
+   - 探测或启动仍失败 → 进入 **B**（WebSearch）。
 
    ```bash
    python skills/patent-disclosure/tools/crawl/cnipa_epub_search.py --type invention 词甲 词乙 词丙
@@ -88,13 +87,13 @@
    - **合并**：一次调用若 stderr 含 **`EPUB_MERGE:`**，以 **stdout** 上**唯一一行** **`EPUB_HITS_JSON:`** 为准（脚本已按 `pub_number` 去重）。仅当拆成多批调用时，Agent 再按 **`pub_number`**（无则 **`link`**）合并。
    - **`cnipa_epub_search.py`** 按空白拆段、**同一浏览器**内一段一查并去重（**stderr** 可出现 **`EPUB_MERGE:`**）。
    - 成功时 **stdout 仅一行** **`EPUB_HITS_JSON:`** + JSON 数组（UTF-8，含中文 `abstract`、**`ipc_codes` / `loc_codes`**）；**`EPUB_PROGRESS:`** / **`EPUB_MERGE:`** / **`EPUB_NOTE:`** / **`EPUB_HINT:`** / **`EPUB_CLASS_HINT:`** / **`BROWSER:`** / **`CNIPA_EPUB_ERROR:`** 等在 **stderr**（多为 ASCII 机读标记）。`EPUB_PROGRESS:` 标明当前卡在 `goto` / `gate` / `submit` 哪一段，短超时也不应静默。
-   - **stderr ≠ 失败**：退出码 **0** 且 stdout 有 `EPUB_HITS_JSON:` 即为成功。PowerShell 可能把 stderr 显示为 `NativeCommandError` 或中文乱码，**禁止**因此判定「未命中」或降级 WebSearch。**禁止** `2>&1` 后再在混合流里找 JSON。脚本已 UTF-8 输出，不必先 `chcp 65001`。
+   - **stderr ≠ 失败**：退出码 **0** 且 stdout 有 `EPUB_HITS_JSON:` 即为成功。PowerShell 把 stderr 显示为 `NativeCommandError` 或中文乱码时，仍以该行 JSON 为准。脚本已 UTF-8 输出。
    - 解析命中时请以 **stdout 该行 JSON 为准**。
    - 将 JSON 中**可核验**的公开号、标题、**国知局站点内详情链接**写入查新笔记与 1.1（见下 **`abstract` 必用**）。
-   - **三种失败，三种后续（禁止混用）**：
-     1. **导航失败**（退出码非 0，stderr 有 `CNIPA_EPUB_ERROR:` `stage=goto|gate|submit`）：看 `hint=`。`skip_epub`（通常是第一轮首页打不开）→ 才进入 **B**。`keep_round1`（通常是第二轮高级查询）→ **保留第一轮 JSON**，按 3b.4 回补；**禁止**当成 0 条，**禁止**因此进 §B。
+   - **三种失败，分开处理**：
+     1. **导航失败**（退出码非 0，stderr 有 `CNIPA_EPUB_ERROR:` `stage=goto|gate|submit`）：看 `hint=`。`skip_epub`（通常是第一轮首页打不开）→ 才进入 **B**。`keep_round1`（通常是第二轮高级查询）→ **保留第一轮 JSON**，按 3b.4 回补，不进入 §B。
      2. **真 0 条**（退出码 0，`EPUB_HITS_JSON: []`）：换词 / 减分类号 / 回补；不是超时。
-     3. **无 Playwright 且安装失败**：进入 **B**。探测或启动仍失败 → **B**，不要反复安装。
+     3. **无 Playwright 且安装失败**：进入 **B**。探测或启动仍失败 → **B**。
    - **降级条件**（满足才进入 **B**）：第一轮 `hint=skip_epub`、无 Playwright 且安装失败、第一轮 stdout **无** `EPUB_HITS_JSON:`、第一轮 **`EPUB_HITS_JSON` 为空数组**且无法按分类号回补、或条目经人工核对明显与主题无关。**第二轮超时/导航失败单独不触发 §B。** **仅有 stderr / 乱码 / NativeCommandError 而退出码为 0 且 JSON 非空 → 不降级。** 等待上限见 `tools/crawl/cnipa_epub_wait.yaml`。
 
 6. **`abstract` 字段（国知局条目，规定必用）**
