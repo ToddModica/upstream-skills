@@ -162,17 +162,17 @@ This document defines all legal states, transition conditions, transition action
 | Stage 2.5 | **checkpoint** | PASS, or recorded Integrity Check FAIL Loop resolution (§ below) | Wait for user confirmation |
 | Stage 2.5 | Stage 2.5 (retry) | FAIL | Fix issues, re-verify (max 3 rounds) |
 | checkpoint | Stage 3 | User confirms | Pass verified paper to reviewer |
-| Stage 3 | **checkpoint** | Decision produced | Wait for user confirmation |
+| Stage 3 | **checkpoint** | Decision produced | Wait for user confirmation (MANDATORY — review decision) |
 | checkpoint | Stage 4 | Decision = Minor/Major, user confirms | Pass Revision Roadmap |
 | checkpoint | Stage 4.5 | Decision = Accept, user confirms | Skip revision, go directly to final verification |
 | Stage 4 | **checkpoint** | Stage 4 completed | Wait for user confirmation |
 | checkpoint | Stage 3' | User confirms | Pass Revised Draft + Original (pre-revision) Draft (#576 §3.1 Phase 2A comparison base) + Response to Reviewers + Editorial Decision Letter (#539 Judge Record input) + Round-1 review findings (Schema 6 reports — #576 §4 level-3 layer) + Round-1 Revision Roadmap + apply report(s) with their paired revision patch/diff files (#390/#576 §11 — the two travel together) + Round-1 Reviewer Configuration Cards (yardstick continuity). Re-review-mode transfer (default); a user-requested fresh full review at 3' passes Revised Draft + available context only (no Roadmap/cards; full mode runs field_analyst) |
-| Stage 3' | **checkpoint** | Decision produced | Wait for user confirmation |
+| Stage 3' | **checkpoint** | Decision produced | Wait for user confirmation (MANDATORY — review decision) |
 | checkpoint | Stage 4.5 | Decision = Accept/Minor, user confirms | Pass final draft to final verification |
 | checkpoint | Stage 4' | Decision = Major, user confirms | Pass new Revision Roadmap |
 | Stage 4' | **checkpoint** | Stage 4' completed | Wait for user confirmation |
 | checkpoint | Stage 4.5 | User confirms | Pass revised draft to final verification |
-| Stage 4.5 | **checkpoint** | PASS (zero issues), or recorded Integrity Check FAIL Loop resolution (§ below) | Wait for user confirmation |
+| Stage 4.5 | **checkpoint** | PASS (zero issues; notes such as UNVERIFIABLE_ACCESS are not issues), or recorded Integrity Check FAIL Loop resolution (§ below) | Wait for user confirmation |
 | Stage 4.5 | Stage 4.5 (retry) | FAIL | Fix issues, re-verify (max 3 rounds) |
 | checkpoint | Stage 5 | User confirms (MANDATORY — the Stage 5 entry gate; see § Stage 5 boundary semantics) | Pass final accepted draft; record the finalization-format decision (citation style) |
 | Stage 5 | **checkpoint** | Stage 5 completed, Final Paper delivered | Wait for user confirmation (FULL — never SLIM; see § Stage 5 boundary semantics) |
@@ -180,6 +180,8 @@ This document defines all legal states, transition conditions, transition action
 | checkpoint | completed | User declines Stage 6 | Mark Stage 6 `skipped` (non-mandatory stage); set pipeline global state `completed` |
 | Stage 6 | **terminal checkpoint** | Process Record delivered | Wait for terminal acknowledgement (see § Stage 6 terminal semantics) |
 | terminal checkpoint | completed | User acknowledges (`finish` / `end` / `done` / `confirm`, or an unambiguous natural-language equivalent) | Mark Stage 6 `completed`; set pipeline global state `completed` |
+
+**Experiment intake (#925).** A run through Stage 1 asks the experiment intake question at the Stage 1 checkpoint; a run that enters or resumes after Stage 1 asks it at entry. No Stage 2 writer or integrity gate is dispatched before the declaration is recorded. When the question is skipped, its wording, and how the answer is recorded: `../agents/pipeline_orchestrator_agent.md` § Experiment Intake Question (#925).
 
 ### Special Flow Transitions
 
