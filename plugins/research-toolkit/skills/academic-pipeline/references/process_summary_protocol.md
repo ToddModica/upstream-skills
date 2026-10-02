@@ -11,8 +11,14 @@
    - Chinese (Traditional Chinese)
    - English
    - Both (default: generate the user's primary conversation language first)
+   Ask in the same question whether to add a PDF. An active standing constraint
+   that answers either point is followed without asking (pipeline orchestrator
+   § Standing Constraints (#927)).
 
-2. Review session history and compile the following:
+2. Review session history and compile the following (after a reset boundary the
+   session holds only the turns since the last resume: take earlier decisions and
+   words from the passport and run ledger, and say in the record which parts come
+   from those rather than the conversation):
    - User's initial instructions (verbatim quote)
    - Key decision points and user interventions at each stage
    - Direction correction moments and reasons
@@ -28,7 +34,7 @@
 
 3. Generate Markdown version (paper_creation_process.md / paper_creation_process_en.md)
 
-4. Convert to LaTeX and compile PDF:
+4. Only when a PDF was asked for, convert to LaTeX and compile PDF:
    - pandoc MD -> LaTeX body
    - Package complete LaTeX document (with cover page, table of contents, headers/footers)
    - tectonic compile PDF
@@ -156,8 +162,8 @@ All metrics below are derived from existing agent logs (`[DA-DECISION]`, `[DA-RE
 |  DA Consecutive Concessions   [list if any]       |
 |  (violations of no-consecutive rule)              |
 |                                                   |
-|  Checkpoints Skipped          X/Y                 |
-|  (SLIM or user-skipped / total checkpoints)       |
+|  SLIM checkpoints             X/Y                 |
+|  User-skipped stages          X/Y                 |
 |                                                   |
 |  User Overrides               X                   |
 |  (times user overruled AI recommendation)         |
@@ -196,13 +202,13 @@ For dimensions with no findings, state the null result in one sentence. Expand o
 
 - **Self-honesty**: AI must not minimize its own shortcomings. If the DA conceded too easily, say so.
 - **Not self-flagellation**: The purpose is transparency, not performative humility. Report facts with interpretation.
-- **Actionable**: Every finding should suggest what could be done differently next time (e.g., "Consider enabling cross-model verification for the next run" or "The user might want to push back harder on DA concessions")
+- **Actionable**: Every finding should suggest what could be done differently next time (e.g., "Consider enabling cross-model verification for the next run" or "The user might want to push back harder on DA concessions"); never suggest a mechanism the user declined
 - **The irony is noted**: This self-reflection is itself produced by the same AI that may have been sycophantic during the pipeline. The user should read it with that awareness. This caveat must be stated in the report.
 
 ## Output Specifications
 
 - **Filename**: `paper_creation_process.md` (Chinese) / `paper_creation_process_en.md` (English)
-- **PDF**: `paper_creation_process_zh.pdf` / `paper_creation_process_en.pdf`
+- **PDF** (when asked for): `paper_creation_process_zh.pdf` / `paper_creation_process_en.pdf`
 - **LaTeX template**: `article` class, 12pt, A4, Times New Roman + Source Han Serif TC VF
 - **Includes table of contents**: `\tableofcontents`
 - **Header**: left = document title (italic), right = date
