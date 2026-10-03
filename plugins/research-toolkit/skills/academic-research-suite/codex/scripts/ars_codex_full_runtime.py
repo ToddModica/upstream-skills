@@ -24,6 +24,7 @@ MANIFEST_PATH = CODEX_ROOT / "full-runtime-manifest.json"
 
 ALIAS_RE = re.compile(r"^\s*(?:(?:use\s+)?\$academic-research-suite[\s.,:;]+)?(/?ars-[a-z0-9-]+)(?![\w-])", re.IGNORECASE)
 DIRECT_MODE_RE = re.compile(r"^\s*\[direct-mode\]\s*", re.IGNORECASE)
+SKILL_SELECTOR_RE = re.compile(r"^\s*(?:use\s+)?\$academic-research-suite[\s.,:;]+", re.IGNORECASE)
 QUESTION_RE = re.compile(
     r"\b(research question|rq|hypothesis|hypotheses|pregunta de investigación|hipótesis)\b|研究問題|研究问题|假設|假设|연구 질문|연구 문제|가설",
     re.IGNORECASE,
@@ -131,6 +132,81 @@ REVIEW_COMPLETION_REQUEST_RE = re.compile(
     re.IGNORECASE,
 )
 
+SCREENING_MODES = (
+    "protocol", "quick", "pilot", "ta-screen", "ft-screen", "adjudicate", "audit", "report",
+)
+SCREENING_REQUEST_RE = re.compile(
+    r"(?:^|[.!?\n]\s*)(?:(?:please|can you|could you|help me(?: to)?|"
+    r"i (?:want|would like) you to)\s+)?(?:"
+    r"(?:screen|rescreen)\s+(?:(?:these|the|my|our|pasted|exported|supplied|attached)\s+)*"
+    r"(?:papers?|records?|abstracts?|titles?|exports?|studies|full[- ]texts?|pdfs?)\b|"
+    r"(?:build|create|draft|prepare|turn)\b[^\n!?]{0,100}\bscreening protocol\b|"
+    r"(?:pilot|resume|continue|run|perform|start)\s+"
+    r"(?:(?:the|a|my|our|title[/ -]abstract|full[- ]text|study|record|calibration)\s+)*screening\b|"
+    r"(?:adjudicate|resolve)\b[^\n.!?]{0,60}\bscreening conflicts\b|"
+    r"(?:audit|recheck|double[- ]check)\s+(?:(?:my|the|these|our|screening)\s+)*exclusions\b|"
+    r"(?:report|give|show|calculate)\b[^\n.!?]{0,100}"
+    r"(?:\b(?:screening|selection) (?:counts|numbers)\b|\bfinished screening\b)|"
+    r"(?:title[/ -]abstract|full[- ]text) screening\b|"
+    r"is\s+(?:this|the)\s+abstract\s+eligible\b)|"
+    r"(?:請|请|幫我|帮我)?(?:篩選|筛选)[^\n。！？]{0,35}"
+    r"(?:文獻|文献|論文|论文|摘要|紀錄|记录|全文)|"
+    r"(?:建立|制定|擬定|拟定)[^\n。！？]{0,30}(?:篩選|筛选)(?:方案|規則|规则|協定)|"
+    r"(?:غربالگری کن|غربالگری مقالات|اسکرینینگ عنوان و چکیده)",
+    re.IGNORECASE,
+)
+
+
+def infer_screening_mode(request: str) -> str | None:
+    """Recognize requested selection work, never infer it from review materials.
+
+    Protocol availability and all human gates are checked by the loaded workflow;
+    selecting a mode does not attest that those prerequisites have been met.
+    """
+    # Negated stages must not become selected modes. Clause-level filtering
+    # keeps a requested TA run when a later sentence postpones full text.
+    clauses = re.split(r"(?<=[!?。！？;；,，])\s*|(?<=\.)\s+|\bbut\b", request, flags=re.IGNORECASE)
+    request = "\n".join(clause for clause in clauses if not re.search(
+        r"\b(?:do not|don't|never|not yet|not now)\b|\bnot\s+(?:full[- ]text|screening)\b|"
+        r"不要|不需|不必|先別|先别", clause, re.IGNORECASE
+    ))
+    lowered = request.lower()
+    named = re.match(r"^\s*(?:(?:use|run)\s+)?sr-screener\b", lowered)
+    if not named and not SCREENING_REQUEST_RE.search(request):
+        return None
+    # Everyday screening/exclusion meanings do not name study selection.
+    if not named and re.search(r"\b(?:plagiarism|airport passengers|financial ledger|spam|job applicants)\b", lowered):
+        return None
+    if named:
+        leading_mode = re.match(r"\s+(" + "|".join(SCREENING_MODES) + r")(?![\w-])", lowered[named.end():])
+        if leading_mode:
+            return leading_mode.group(1)
+        modes = [mode for mode in SCREENING_MODES if re.search(
+            rf"(?<![\w-]){re.escape(mode)}(?![\w-])", lowered[named.end():]
+        )]
+        if len(modes) == 1:
+            return modes[0]
+    if re.search(r"\b(?:build|create|draft|prepare|turn)\b[^\n!?]{0,100}\bscreening protocol\b|(?:建立|制定|擬定|拟定).{0,30}(?:篩選|筛选)", lowered):
+        return "protocol"
+    if re.search(r"\b(?:adjudicate|resolve)\b.{0,60}\bscreening conflicts\b", lowered):
+        return "adjudicate"
+    if re.search(r"\b(?:audit|recheck|double[- ]check)\b.{0,40}\bexclusions\b", lowered):
+        return "audit"
+    if re.search(r"\b(?:report|give|show|calculate)\b.{0,100}(?:\b(?:screening|selection) (?:counts|numbers)\b|\bfinished screening\b)", lowered):
+        return "report"
+    if re.search(r"\bpilot\b", lowered):
+        return "pilot"
+    if re.search(r"\b(?:full[- ]text|pdfs?|ft-screen)\b|全文", lowered):
+        return "ft-screen"
+    if re.search(r"\b(?:quick|pasted)\b|\bis (?:this|the) abstract eligible\b", lowered):
+        return "quick"
+    # Numbered pasted records can identify a small triage request, not approval.
+    if re.search(r"\bscreen these abstracts\b", lowered) and re.search(r"(?m)^\s*1[.)]\s+", request):
+        return "quick"
+    if named or re.search(r"proposal\.(?:docx|pdf)|no confirmed|without.{0,30}protocol|پروتکل", lowered):
+        return "protocol"
+    return "ta-screen"
+
 
 def load_manifest(path: Path = MANIFEST_PATH) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
@@ -196,10 +272,15 @@ def infer_natural_route(request: str) -> tuple[str, str, str]:
         return "academic-paper", "revision-coach", "natural_revision_coach_request"
     if re.search(r"(?<![\w/-])(?:run\s+)?lit-review(?![\w-])", lowered):
         return "academic-paper", "lit-review", "natural_paper_literature_request"
+    if re.search(r"\b(?:write|draft)\s+(?:(?:a|the|my|our)\s+)*literature review\b", lowered):
+        return "academic-paper", "lit-review", "natural_paper_literature_request"
     if re.search(r"\b(?:draft|write|create)\s+(?:(?:a|an|the|my|paper)\s+)*outline\b|撰寫大綱|撰写大纲", lowered):
         return "academic-paper", "outline-only", "natural_outline_request"
     if re.search(r"\bplan\s+(?:(?:a|the|my|this)\s+)*(?:paper|manuscript)\b|論文規劃|论文规划", lowered):
         return "academic-paper", "plan", "natural_plan_request"
+    screening_mode = infer_screening_mode(request)
+    if screening_mode:
+        return "sr-screener", screening_mode, "explicit_screening_request"
     # Spanish uses intent-specific compounds, preserving the upstream boundary
     # between editing one's draft and reviewing a submitted manuscript.
     if re.search(r"\b(?:enmendar|enmienda)\s+mi\s+artículo\b", lowered):
@@ -867,7 +948,7 @@ def plan_request(
     command = command_by_alias(manifest, alias)
     route_reason = "alias_router" if command else "natural_language_router"
     direct_agent = None
-    text = intent_text(request)
+    text = SKILL_SELECTOR_RE.sub("", intent_text(request), count=1)
     target = direct_target(text, manifest) if direct_mode else None
 
     if command:
@@ -879,18 +960,26 @@ def plan_request(
     elif target:
         workflow, direct_agent = target
         mode = "direct-agent" if direct_agent else (
-            "pipeline" if workflow == "academic-pipeline" else "full"
+            manifest["workflows"][workflow].get(
+                "default_mode", "pipeline" if workflow == "academic-pipeline" else "full"
+            )
         )
         if not direct_agent:
             named_modes = [candidate for candidate in manifest["workflows"][workflow]["modes"]
                            if re.search(rf"(?<![\w-]){re.escape(candidate)}(?![\w-])", text, re.IGNORECASE)]
             if len(named_modes) == 1:
                 mode = named_modes[0]
+            if workflow == "sr-screener":
+                mode = infer_screening_mode(text) or mode
         recipe = model_hint = None
         route_reason = "direct_mode_named_agent" if direct_agent else "direct_mode_named_workflow"
     else:
         workflow, mode, route_reason = infer_natural_route(text)
         recipe = model_hint = None
+        if route_reason == "natural_research_request" and re.search(
+            r"\bwhat\s+(?:(?:should|do|can)\s+i\s+(?:do\s+)?)?next\b|下一步", text, re.IGNORECASE,
+        ):
+            return clarification_plan(manifest, profile, request, "open_next_step_requires_clarification", direct_mode)
         implicit = route_reason in {"default_academic_planning", "paper_topic_scoping_override"}
         if route_reason == "natural_research_request" and has_cross_phase_materials(request):
             implicit = not bool(re.search(
@@ -914,6 +1003,13 @@ def plan_request(
         # A named role must not widen into the containing workflow's whole team.
         topology_profile = {**profile, "agent_team_enabled": False, "topology_experiment_enabled": False}
     topology_plan = build_topology_plan(workflow, mode, topology_profile)
+    if workflow == "sr-screener" and not direct_agent:
+        # This static topology plans the dispatcher only. It cannot certify
+        # human gates, assign unknown batches, or promise isolated reviewers.
+        topology_plan["scope"] = "screening_dispatcher_only"
+        topology_plan["information_sharing"]["policy"] = "dispatcher_only_no_dual_review"
+        for node in topology_plan["nodes"]:
+            node["emits"] = ["screening_dispatch_plan"]
     if direct_agent:
         topology_plan["scope"] = "direct_agent_only"
         node = topology_plan["nodes"][0]
@@ -964,6 +1060,26 @@ def plan_request(
         required_reads.append("ars/academic-paper/agents/citation_compliance_agent.md")
         if re.search(r"Chinese|中文|漢字|汉字|중국어", request, re.IGNORECASE):
             required_reads.append("ars/academic-paper/references/apa7_chinese_citation_guide.md")
+    screening_contract = None
+    if workflow == "sr-screener":
+        required_reads.extend([
+            workflow_config["agent_template"],
+            "ars/sr-screener/references/orchestration.md",
+            "ars/sr-screener/references/decision_rules.md",
+        ])
+        role_file = {
+            "protocol": "protocol_architect_agent.md",
+            "pilot": "qc_auditor_agent.md",
+            "report": "reporter_agent.md",
+        }.get(mode, "screening_reviewer_agent.md")
+        required_reads.append(prompt_path(workflow, role_file))
+        if mode != "protocol":
+            required_reads.append("ars/sr-screener/references/reviewer_roles.md")
+        screening_contract = {
+            **manifest["runtime_options"]["screening"],
+            "gate_status": "not_attested_by_planner",
+            "dispatch_authorized": False,
+        }
 
     return {
         "adapter": manifest["adapter"]["name"],
@@ -985,6 +1101,7 @@ def plan_request(
         "stop_at_checkpoint": checkpoint,
         "agent_template": None if direct_agent else workflow_config.get("agent_template"),
         "agent_team_plan": agent_plan,
+        "screening_contract": screening_contract,
         "topology_plan": topology_plan,
         "quality_gates": gates,
         "quality_gate_scope": "package_validation_catalog",

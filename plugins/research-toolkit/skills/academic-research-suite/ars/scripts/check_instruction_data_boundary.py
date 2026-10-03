@@ -93,6 +93,11 @@ HOTSPOT_AGENTS = (
     "academic-paper-reviewer/WORKFLOW.md",
     "academic-pipeline/WORKFLOW.md",
     "deep-research/WORKFLOW.md",
+    # sr-screener: every screening call reads third-party record text
+    # (titles, abstracts, full-text PDFs). The reviewer subagent is the
+    # receiver; WORKFLOW.md is the main session's home (quick mode).
+    "sr-screener/WORKFLOW.md",
+    "sr-screener/agents/screening_reviewer_agent.md",
 )
 
 

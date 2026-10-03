@@ -15,7 +15,7 @@ import yaml
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from _skill_lint import _uses_codex_workflow_overlay  # noqa: E402
 
-SKILLS = ("deep-research", "academic-paper", "academic-paper-reviewer", "academic-pipeline")
+SKILLS = ("deep-research", "academic-paper", "academic-paper-reviewer", "academic-pipeline", "sr-screener")
 MAX_LENGTH = 1024
 
 

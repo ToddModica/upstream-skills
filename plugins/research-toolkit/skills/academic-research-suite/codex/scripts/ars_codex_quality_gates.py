@@ -80,6 +80,7 @@ _REQUIRED_WORKFLOWS = frozenset(
         "academic-paper-reviewer",
         "academic-pipeline",
         "experiment-agent",
+        "sr-screener",
     }
 )
 
@@ -104,7 +105,7 @@ def _top_level_source_paths(source: object) -> set[str]:
 def _external_workflow_names(package: dict[str, Any]) -> set[str]:
     """Return separately sourced top-level names, excluding primary overlaps.
 
-    A secondary source such as ``experiment-agent`` may live beside the four
+    A secondary source such as ``experiment-agent`` may live beside the five
     canonical ARS workflows without becoming part of the ARS inventory parity
     contract. A name also declared by the primary ARS source remains core: a
     secondary lock must never make a canonical workflow disappear from this

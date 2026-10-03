@@ -32,6 +32,18 @@ test.before(async () => {
   parseSkillFile = parser.parseSkillFile;
 });
 
+test('plugin module exposes only the default export (regression guard for #631, #301)', async () => {
+  const url = pathToFileURL(path.join(__dirname, '..', '.opencode', 'plugins', 'ponytail.mjs'));
+  const mod = await import(url);
+  const namedExports = Object.keys(mod).filter((k) => k !== 'default');
+  assert.deepEqual(
+    namedExports,
+    [],
+    'ponytail.mjs must not have named exports: OpenCode\'s legacy getLegacyPlugins() ' +
+    'loader calls every exported function as a plugin factory'
+  );
+});
+
 // ---------------------------------------------------------------- V2 ------
 // The V2 half of the default export: a definition object, not a function. V2
 // rejects the V1 function shape outright, so this is the whole load contract.
@@ -129,6 +141,17 @@ test('V2 unsupported /ponytail arguments do not reset the current mode', async (
   fs.writeFileSync(statePath, 'ultra');
   await added.commands.ponytail.execute({ sessionID: 's', prompt: { text: 'status' }, delivery: 'steer' });
   assert.equal(fs.readFileSync(statePath, 'utf8'), 'ultra');
+});
+
+test('V2 bare /ponytail keeps a running level and switches an off session on (#639)', async () => {
+  const { added } = await setupV2();
+  fs.writeFileSync(statePath, 'ultra');
+  await added.commands.ponytail.execute({ sessionID: 's', prompt: { text: '' }, delivery: 'steer' });
+  assert.equal(fs.readFileSync(statePath, 'utf8'), 'ultra', 'checking the level must not reset ultra');
+
+  fs.writeFileSync(statePath, 'off');
+  await added.commands.ponytail.execute({ sessionID: 's', prompt: { text: '' }, delivery: 'steer' });
+  assert.equal(fs.readFileSync(statePath, 'utf8'), 'full');
 });
 
 test('V1 and V2 share one mode file, so a level set under either API applies to both', async () => {

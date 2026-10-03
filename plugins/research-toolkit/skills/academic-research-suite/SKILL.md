@@ -1,10 +1,10 @@
 ---
 name: academic-research-suite
 description: >
-  ARS-Codex research, academic writing, manuscript review, and experiment planning.
+  ARS-Codex research, writing, manuscript review, study screening, and experiments.
   Use for deep research, literature or systematic reviews, meta-analysis, research
-  questions, paper drafts, revisions, revision roadmaps, abstracts, citations,
-  integrity checks, peer review, and research-to-paper workflows. Citation triggers:
+  questions, drafts, revisions, roadmaps, abstracts, citations,
+  integrity checks, peer review, research-to-paper. Screen records: sr-screener. Citation triggers:
   check citations, look over the refs, 檢查引用, 檢查參考文獻, 인용 확인, 인용 형식 검사. Korean: 논문 심사,
   논문 수정, 초록 작성, 체계적 문헌고찰, 연구부터 논문까지. Español: revisión de literatura,
   revisar artículo, enmendar mi artículo, escribir resumen, investigación a artículo.
@@ -12,9 +12,9 @@ description: >
   /ars-citation-check, /ars-disclosure, /ars-format-convert, /ars-3w,
   /ars-revision-coach, /ars-revision, /ars-reviewer, /ars-mark-read,
   /ars-unmark-read, /ars-cache-invalidate, /ars-rebuttal-audit, /ars-full.
-  Role prompts, references, templates, and handoff schemas live under ars/.
+  Prompts, references, templates, and contracts live under ars/.
 metadata:
-  version: "3.22.2"
+  version: "3.23.0"
   upstream_suite: "academic-research-skills"
   codex_adapter: true
 allowed-tools: Read, Glob, Grep, WebSearch, Bash(uv *), Bash(python *), Bash(python3 *)
@@ -27,7 +27,7 @@ This is a Codex adapter for the ARS suite. The vendored ARS content lives under
 
 ## Versioning
 
-This Codex package is version `3.22.2`. The repo-root `VERSION`, this
+This Codex package is version `3.23.0`. The repo-root `VERSION`, this
 `SKILL.md` metadata version, and `manifest.json` `adapter_version` must match.
 Starting at `3.22.0`, this release number also matches the vendored ARS suite.
 The exact upstream version, tag, and commit are recorded in `manifest.json`;
@@ -67,6 +67,8 @@ Otherwise, classify the user's input:
 3. **Ambiguous intent, no materials** — user provides no artifacts and no clear request:
    → Clarify per `shared/references/intent_clarification_protocol.md`.
 
+**Screening boundary (sr-screener):** a request to screen records the user already has (database exports, pasted abstracts, full-text PDFs) against a review's eligibility criteria, or to build a screening protocol, pilot the screening, adjudicate screening conflicts, audit exclusions, or report the selection counts, routes to `sr-screener`. A request to write a literature review, or to run a systematic review, meta-analysis, or PRISMA report, does not route to `sr-screener`. Screening starts only when the user asks for it: `deep-research` `systematic-review` mode may mention `sr-screener`, but never hands over to it automatically.
+
 **Anti-pattern (caused #133):** Receiving ambiguous cross-phase materials and silently auto-routing to a single-phase agent based on which phase the materials "look closest to." This bypasses orchestrator-level reconciliation and lets the subagent inherit the full ambiguity without independent oversight.
 <!-- routing-core:end -->
 
@@ -78,11 +80,32 @@ Choose the workflow by the settled intent:
 | Academic paper writing, paper outline, abstract, revision, citation formatting, AI disclosure, LaTeX/DOCX/PDF formatting guidance | `ars/academic-paper/WORKFLOW.md` |
 | Paper review, peer review simulation, editorial decision, reviewer calibration, re-review after revision | `ars/academic-paper-reviewer/WORKFLOW.md` |
 | End-to-end research-to-paper pipeline, integrity gate, staged review/revision/finalization workflow | `ars/academic-pipeline/WORKFLOW.md` |
+| Explicit study selection: screening protocol, eligibility decisions on supplied records, pilot, conflicts, exclusion audit, screening counts | `ars/sr-screener/WORKFLOW.md` |
 | Experiment planning, code experiment execution plan, human study protocol, statistical interpretation, reproducibility validation | `ars/experiment-agent/WORKFLOW.md` |
 
 An explicit end-to-end request selects `academic-pipeline`. Materials spanning
 multiple phases without an explicit workflow require clarification using the
 core above; they do not by themselves select a pipeline.
+
+### Study Screening Boundary
+
+Use `ars/sr-screener/WORKFLOW.md` only for an explicit screening request. Its
+modes are `protocol`, `quick`, `pilot`, `ta-screen`, `ft-screen`, `adjudicate`,
+`audit`, and `report`. A whole systematic review, meta-analysis, literature
+review, PRISMA report, or the presence of database exports does not activate
+screening. `deep-research` may offer screening; `academic-pipeline` never
+inserts it as an automatic stage. Accept its completed corpus through the
+Material Passport when the user requests a handoff.
+
+Read `codex/agents/sr-screener-team.md` and the selected mode's source prompts.
+A confirmed protocol precedes every decision; full runs retain human pilot,
+cost, QC, and final verification gates. In Codex, use emitted prompt files
+with fresh, blinded native workers when available; the upstream generated
+Claude Workflow script is not a native Codex executor. A/B workers never see
+each other's output. Without isolated workers, only disclosed `quick`
+single-reviewer triage is available. Claude Sonnet/Opus screening defaults are
+not Codex model selections: preserve explicit supported user/runtime choices,
+record the actual model, and show the concrete estimate before fan-out.
 
 ### Spanish Intent Routing
 
@@ -223,6 +246,7 @@ using them in Codex:
 | AskUserQuestion | Ask concise clarification questions, or use Codex's structured user-input tool when available in the active mode. |
 | WebSearch | Use Codex web browsing for current facts, source verification, citation checks, and external evidence. Provide source links. |
 | Bash, Write, Edit | Treat as capability descriptions, not required tool names. Follow Codex safety rules and the user's filesystem constraints. |
+| Screening reviewer `tools: Read, Grep` | Use a fresh native worker with only the supplied protocol, prompt and records; no browsing, writing, peer output, or inherited conversation. If the host cannot provide this isolation, offer `quick` single-reviewer triage. Tool metadata alone does not establish isolation. |
 | Agent frontmatter `tools: Read, Write, Edit, Grep, Glob` | Preserve this as a least-privilege role boundary. The three protected top-level agent roles do not receive Bash or network transport when dispatched separately; inline execution must not use those roles to widen the current task's authority. |
 | Claude, Claude Code, model-specific wording | Interpret as "the current Codex agent" unless the text is part of a disclosure template or historical example. |
 | `ARS_MODEL_TIERING=economy|quality-boost` | Unset remains the default and preserves current-model behavior. The upstream relative Opus/Sonnet tier names are not hard-mapped to Codex model ids. Apply tiering only when the active Codex runtime supports an explicit per-dispatch model override; otherwise announce a one-line no-op and keep every role on the active model. Use `ars/shared/model_tiering.md` and `ars/scripts/model_tiering_manifest.json` as the classification contract. |
