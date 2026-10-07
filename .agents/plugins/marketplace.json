@@ -105,9 +105,8 @@
     {
       "name": "diagram-design",
       "source": {
-        "source": "git-subdir",
+        "source": "url",
         "url": "https://github.com/cathrynlavery/diagram-design.git",
-        "path": "./",
         "ref": "main"
       },
       "policy": {

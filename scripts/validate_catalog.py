@@ -117,7 +117,7 @@ def main() -> None:
     diagram = entries.get("diagram-design", {})
     diagram_lock = source_by_name.get("diagram-design", {})
     diagram_url = "https://github.com/cathrynlavery/diagram-design.git"
-    if diagram.get("source") != {"source": "git-subdir", "url": diagram_url, "path": "./", "ref": "main"} or diagram.get("category") != "Creativity":
+    if diagram.get("source") != {"source": "url", "url": diagram_url, "ref": "main"} or diagram.get("category") != "Creativity":
         fail("diagram-design: expected official Git source in Creativity")
     if diagram_lock.get("kind") != "plugin" or diagram_lock.get("action") != "track-only" or diagram_lock.get("upstream") != diagram_url or diagram_lock.get("branch") != "main" or diagram_lock.get("license") != "MIT" or not SHA.fullmatch(str(diagram_lock.get("commit_sha", ""))):
         fail("diagram-design: official plugin source lock is missing or invalid")
