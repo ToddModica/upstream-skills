@@ -1,6 +1,6 @@
 # Codex 上游 Skills Marketplace
 
-这是一个公开的 Codex Git Marketplace，用于分发具有明确上游来源和可再分发许可证的科研、写作、文档及开发工作流。每个已打包的第三方 Skill 保留原目录、脚本、参考资料、资源文件和许可证；版本与 commit SHA 记录在 `sources.json`。少数外部插件（当前为 Tavotto）只在市场清单中引用其官方发布分支，不复制其上游代码。
+这是一个公开的 Codex Git Marketplace，用于分发具有明确上游来源和可再分发许可证的科研、写作、文档、开发及图示设计工作流。每个已打包的第三方 Skill 保留原目录、脚本、参考资料、资源文件和许可证；版本与 commit SHA 记录在 `sources.json`。外部插件 Tavotto 与 Diagram Design 在市场清单中引用其官方分支，安装时获取完整上游插件。
 
 ## 许可证边界
 
@@ -21,6 +21,7 @@ Tavotto 通过其官方 `plugin-stable` 分支按需拉取，许可证为 **AGPL
 - 开发与文档：[`bilibili-page-reader`、`powershell-safe-invocation`](https://github.com/Misaka-Mikoto-Tech/agent-skills)、[`design-taste-frontend`](https://github.com/Leonxlnx/taste-skill)、[`ppt-master`](https://github.com/hugohe3/ppt-master)、[`grilling`](https://github.com/mattpocock/skills)。
 - 插件与 MCP：[`ponytail`](https://github.com/DietrichGebert/ponytail)、[`watermarks-remover`](https://github.com/guillaumemeyer/watermarks-remover)、[`no-negative-echo`](https://github.com/LB623/no-negative-echo)、[`itasca-mcp`](https://github.com/yusong652/itasca-mcp)、[`Tavotto`](https://github.com/Tavotto/Tavotto)。Tavotto 的插件来源固定为上游 `plugin-stable` 发布分支。
 - CAD 运行时：专利工具的 STEP/SVG 处理使用 [`CadQuery`](https://github.com/CadQuery/cadquery)。
+- 图示设计：[`Diagram Design`](https://github.com/cathrynlavery/diagram-design)，MIT 许可证，独立插件归入 `Creativity`，来源为官方 `main` 分支。
 
 `imagegen`、`openai-docs`、`skill-creator`、`skill-installer`、`doc` 与 `pdf` 由 Codex 运行时提供；当前 `sources.json` 不含其可公开锁定的 GitHub 上游地址。
 
@@ -45,6 +46,7 @@ codex plugin add ponytail@research-toolkit-marketplace
 codex plugin add watermarks-remover@research-toolkit-marketplace
 codex plugin add no-negative-echo@research-toolkit-marketplace
 codex plugin add tavotto@research-toolkit-marketplace
+codex plugin add diagram-design@research-toolkit-marketplace
 ```
 
 安装后新建 Codex 任务，使 Skills、Hooks 和 MCP 工具加载。
@@ -118,6 +120,28 @@ tavotto codex doctor
 ```
 
 Windows 上每次 Tavotto 插件升级后都应再运行一次 `tavotto codex install`，以校正 MCP 使用的 Python 启动器。只安装 Tavotto 桌面版时可交接图形到桌面窗口；若要在 Codex 内使用 Tavotto MCP 画布与导出工具，仍需安装上述 `tavotto[worker]` 引擎。完成安装后必须新建 Codex 任务。
+
+### Diagram Design（Creativity）
+
+Diagram Design 适用于架构图、流程图、时序图、数据流图、层次图和已有图的重新排版，输出 HTML、SVG 或 PNG。市场直接引用 Cathryn Lavery / LittleMight 的官方仓库；上游插件保留作者信息、MIT 许可证、第三方许可说明与完整模板、参考资料及脚本。此市场条目由本市场维护。
+
+HTML 预览只需现代浏览器；图源解析、SVG 导出和自检使用 Python 标准库。PNG 导出需要 Python Playwright 与 Chromium：
+
+```powershell
+python -m pip install playwright
+python -m playwright install chromium
+```
+
+安装后新建 Codex 任务，直接描述任务即可按 Skill 描述自动匹配，例如：“把这个系统画成架构图，采用默认配色，输出 HTML 和 PNG。”也可以输入 `@diagram-design` 或 `$diagram-design` 明确选择插件或 Skill。首次使用时可选择默认风格、网站配色或已有品牌资料；在请求中写明“采用默认配色”即可给出该选择。
+
+适合的任务包括结构和流程说明、汇报插图及 draw.io / Mermaid / Excalidraw 图源重绘。论文数据图仍应按数据、统计与期刊要求选择科研绘图工作流。模板默认从 Google Fonts 加载字体，离线时使用系统回退字体；按网站提取品牌时才需要访问用户指定的网站。详见[上游隐私说明](https://github.com/cathrynlavery/diagram-design/blob/main/PRIVACY.md)。
+
+GitHub Actions 会自动刷新 `sources.json` 中的上游提交记录。已安装插件需刷新本机市场和插件后，在新任务中加载：
+
+```powershell
+codex plugin marketplace upgrade research-toolkit-marketplace
+codex plugin add diagram-design@research-toolkit-marketplace
+```
 
 ## 主要本机依赖
 

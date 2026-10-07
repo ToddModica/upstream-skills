@@ -22,8 +22,11 @@
 | Taste Skill | https://github.com/Leonxlnx/taste-skill | MIT | codex-utility-toolkit |
 | PPT Master | https://github.com/hugohe3/ppt-master | MIT | codex-utility-toolkit |
 | Ponytail | https://github.com/DietrichGebert/ponytail | MIT | ponytail |
+| Diagram Design (Cathryn Lavery / LittleMight) | https://github.com/cathrynlavery/diagram-design | MIT | diagram-design (official Git reference) |
 
 Ponytail 作为独立插件完整保留上游许可证、版本、Skills、Hooks、脚本、测试与资源；锁定 commit 另行记录在 `sources.json` 中。
+
+Diagram Design 通过官方仓库 `main` 分支安装。本市场维护来源引用与核验提交记录，插件由 Cathryn Lavery / LittleMight 发布。完整 `LICENSE`、`THIRD_PARTY_LICENSES.md` 和 `PRIVACY.md` 随上游插件获取；其中图标与字体资源分别受上游记录的 MIT、CC0 或 SIL Open Font License 等条款约束，品牌标志仍属于其各自权利人。
 
 由 Codex 本地发行环境提供并带有 Apache-2.0 许可证的 `doc`、`pdf`、`imagegen`、`openai-docs`、`skill-creator` 和 `skill-installer`，其许可证文件保留在各自 Skill 目录中。
 

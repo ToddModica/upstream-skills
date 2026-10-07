@@ -114,6 +114,13 @@ def main() -> None:
     if len(copy_targets) != len(set(copy_targets)):
         fail("sources.json contains duplicate copy targets")
     source_by_name = {item["name"]: item for item in sources["sources"]}
+    diagram = entries.get("diagram-design", {})
+    diagram_lock = source_by_name.get("diagram-design", {})
+    diagram_url = "https://github.com/cathrynlavery/diagram-design.git"
+    if diagram.get("source") != {"source": "git-subdir", "url": diagram_url, "path": "./", "ref": "main"} or diagram.get("category") != "Creativity":
+        fail("diagram-design: expected official Git source in Creativity")
+    if diagram_lock.get("kind") != "plugin" or diagram_lock.get("action") != "track-only" or diagram_lock.get("upstream") != diagram_url or diagram_lock.get("branch") != "main" or diagram_lock.get("license") != "MIT" or not SHA.fullmatch(str(diagram_lock.get("commit_sha", ""))):
+        fail("diagram-design: official plugin source lock is missing or invalid")
     for plugin, names in REQUIRED_SKILLS.items():
         if plugin == "ponytail":
             continue
