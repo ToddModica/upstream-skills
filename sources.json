@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-07T09:41:04+00:00",
+  "generated_at": "2026-10-07T22:17:01+00:00",
   "user_excluded": [],
   "sources": [
     {
@@ -456,7 +456,7 @@
       "name": "ppt-master",
       "upstream": "https://github.com/hugohe3/ppt-master.git",
       "branch": "main",
-      "commit_sha": "2d72da616cf9fa40d4dcaf59fd4c980ecf534b7d",
+      "commit_sha": "440557b8dc7c7257b69c04a0b014d5c50a78e6cb",
       "local_snapshot_sha": "0d3904a4ef72b8732d3d6ee23d500c21d2969425",
       "upstream_subpath": "skills/ppt-master",
       "local_relative": "ppt-master",
@@ -600,7 +600,7 @@
       "name": "grilling",
       "upstream": "https://github.com/mattpocock/skills.git",
       "branch": "main",
-      "commit_sha": "dd400c3ad65e57c06f05e832e0aac92c7992f34d",
+      "commit_sha": "f3fc5632f401156837ee3872f14fe33ccf1024ea",
       "local_snapshot_sha": "2ab958093e83e0ec752e6c1c5932da465bf23e0c",
       "upstream_subpath": "skills/productivity/grilling",
       "local_relative": "grilling",
