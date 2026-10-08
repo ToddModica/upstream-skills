@@ -22,6 +22,8 @@ user-invocable: false
 
 **先 `Read` `prompts/patent_search.md`。** 用户给单图或权要时再 `Read` `prompts/derived_query.md`。对照表派工或用户点名「按特征精排」时再 `Read` `prompts/covers_rank.md`。翻页口径以该文件「默认少翻页 / 完整性门禁」为准。
 
+填表语法跟公布站高级查询说明走，**按字段区分**，不要混用（细则见 `prompts/patent_search.md`）。
+
 ```bash
 python skills/patent-search/tools/cnipa_search.py --inventor "姓名" --applicant "单位"
 python skills/patent-search/tools/cnipa_search.py --title "数据处理" --abstract "吸附 and 再生" --class B01J20 --max-pages 2
