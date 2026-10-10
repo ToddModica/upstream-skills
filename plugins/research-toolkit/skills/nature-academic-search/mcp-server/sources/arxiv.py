@@ -1,5 +1,7 @@
 """arXiv data source via REST API (Atom XML feed)."""
 
+from __future__ import annotations
+
 import re
 import time
 import urllib.parse
