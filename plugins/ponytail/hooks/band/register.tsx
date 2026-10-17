@@ -18,8 +18,10 @@ import {
   isCode,
   isSource,
   isTestCommand,
+  mainModel,
   markdown,
   metricsSvg,
+  MODEL_PATTERN,
   parseDefs,
   percent,
   resume,
@@ -37,6 +39,7 @@ import {
 const LEVELS = ['off', 'lite', 'full', 'ultra']
 const EMPTY: Band = {
   level: 'off',
+  model: '',
   cost: 0,
   spent: 0,
   turns: 0,
@@ -63,6 +66,7 @@ const TASK = {
   tokens: NO_TOKENS,
   busyMs: 0,
   name: '',
+  model: '',
   reused: [],
   created: [],
   dupes: [],
@@ -114,6 +118,13 @@ async function readTitle($: EngineInterface, transcript: string): Promise<string
   const grep = await $.process.run(['grep', '-F', TITLE_RECORD, transcript]).catch(() => undefined)
   const text = grep !== undefined && grep.exitCode <= 1 ? grep.stdout : await $.fs.read(transcript).catch(() => '')
   return sessionTitle(text)
+}
+
+// The model that wrote most of the session's replies, so the board can tell models apart.
+async function readModel($: EngineInterface, transcript: string): Promise<string> {
+  if (transcript === '') return ''
+  const grep = await $.process.run(['grep', '-o', MODEL_PATTERN, transcript]).catch(() => undefined)
+  return grep?.exitCode === 0 ? mainModel(grep.stdout) : ''
 }
 
 // Where the task ledgers and the board live.
@@ -266,6 +277,7 @@ export const register: Register = (on, options) => {
     const level = await readLevel($)
     const { removed, transcript } = await load($)
     const title = await readTitle($, transcript)
+    const model = await readModel($, transcript)
 
     // A removed or renamed definition that is not defined again but still called somewhere.
     // shortcut: name match with git grep, so a same-named call in another module counts too.
@@ -299,6 +311,7 @@ export const register: Register = (on, options) => {
         tokens: used ? addTokens(b.tokens, used) : b.tokens,
         busyMs: b.busyMs + e.durationMs,
         name: title ?? b.name,
+        model: model || b.model,
         removed: stillRemoved,
         openCallers: open,
       }

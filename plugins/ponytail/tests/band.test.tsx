@@ -13,6 +13,7 @@ import {
   elapsed,
   fmtTokens,
   isTestCommand,
+  mainModel,
   markdown,
   metricsSvg,
   parseDefs,
@@ -37,7 +38,7 @@ describe('board', () => {
     expect(rows.length).toBe(3)
     expect(rows[1]?.[3]).toBe('Fix "cart", totals\nand tax')
     const tasks = tasksFrom(CSV)
-    expect(tasks[0]).toEqual({ started: '2026-10-15 12:00', project: 'shop', name: 'Fix "cart", totals\nand tax', cost: 3.1, turns: 6, agentMinutes: 26, tokens: 1_200_000, reuse: 83, tests: '14 passed', level: 'full' })
+    expect(tasks[0]).toEqual({ started: '2026-10-15 12:00', project: 'shop', name: 'Fix "cart", totals\nand tax', cost: 3.1, turns: 6, agentMinutes: 26, tokens: 1_200_000, reuse: 83, tests: '14 passed', level: 'full', model: '' })
     expect(tasks[1]?.reuse).toBeNull()
     expect(tasksFrom('not,a,ledger\n1,2,3')).toEqual([])
   })
@@ -80,7 +81,7 @@ describe('metrics', () => {
   })
 
   const BASE: Band = {
-    level: 'full', cost: 31.9, spent: 3.1, turns: 6, turnCosts: [0.42], tokens: { input: 5000, output: 85_000, cacheRead: 1_100_000, cacheWrite: 10_000 },
+    level: 'full', model: 'claude-opus-5-5', cost: 31.9, spent: 3.1, turns: 6, turnCosts: [0.42], tokens: { input: 5000, output: 85_000, cacheRead: 1_100_000, cacheWrite: 10_000 },
     busyMs: 1_560_000, name: 'Fix the cart | totals, again', project: 'shop', session: '4c69e3db-57a0', transcript: '', reused: ['to_cents'], created: [], dupes: [],
     removed: [], openCallers: [], tests: { state: 'pass', passed: 14 }, details: false,
   }
@@ -98,6 +99,18 @@ describe('metrics', () => {
     expect(resume(ahead, csv, '4c69e3db-7')).toEqual(ahead)
     expect(resume(fresh, csv, 'missing-1')).toEqual(fresh)
     expect(resume(fresh, '', '4c69e3db-7')).toEqual(fresh)
+  })
+
+  test('the row names the model that wrote most replies, and an older ledger keeps its rows', () => {
+    expect(mainModel('"model":"claude-opus-5-5"\n"model":"claude-haiku-5-5"\n"model":"claude-opus-5-5"\n')).toBe('claude-opus-5-5')
+    expect(mainModel('')).toBe('')
+    const old = 'key,started,project,name,cost_usd,turns,agent_minutes,tokens_total,tokens_output,reuse_pct,reused,new,callers_open,tests,level\n' +
+      'other-1,2026-10-14 09:00,shop,Other,1.00,2,3.0,500,50,,0,0,0,not run,full\n'
+    const csv = upsertCsv(old, snapshot(BASE, Date.UTC(2026, 9, 15, 12, 0)))
+    expect(csv.split('\n')[0]).toBe(CSV_HEADER)
+    expect(csv.split('\n').filter(line => line.startsWith('key,')).length).toBe(1)
+    expect(tasksFrom(csv).map(t => t.model)).toEqual(['', 'claude-opus-5-5'])
+    expect(markdown(snapshot(BASE, Date.UTC(2026, 9, 15, 12, 0)))).toContain('| Model | claude-opus-5-5 |')
   })
 
   test('the webhook sends the token only over https, or to this machine', () => {

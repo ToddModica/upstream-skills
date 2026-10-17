@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-16T20:05:41+00:00",
+  "generated_at": "2026-10-17T19:42:58+00:00",
   "user_excluded": [],
   "sources": [
     {
@@ -456,7 +456,7 @@
       "name": "ppt-master",
       "upstream": "https://github.com/hugohe3/ppt-master.git",
       "branch": "main",
-      "commit_sha": "aabf2a0541d9d3b0bdb9e8564a0217f0eaff7815",
+      "commit_sha": "b113d23720260c411ee47b2b05a73615f954deeb",
       "local_snapshot_sha": "0d3904a4ef72b8732d3d6ee23d500c21d2969425",
       "upstream_subpath": "skills/ppt-master",
       "local_relative": "ppt-master",
@@ -616,8 +616,8 @@
       "name": "ponytail",
       "upstream": "https://github.com/DietrichGebert/ponytail.git",
       "branch": "main",
-      "commit_sha": "6f1c2bfff0c837d268929a7c4e490918eb4fab29",
-      "version": "5.3.1",
+      "commit_sha": "16352ac229eb08a9598dcae48fe9f2b342567d86",
+      "version": "5.3.2",
       "upstream_subpath": null,
       "local_relative": null,
       "target": "plugins/ponytail",
@@ -632,7 +632,7 @@
       "name": "remove-ai-marks",
       "upstream": "https://github.com/guillaumemeyer/watermarks-remover.git",
       "branch": "main",
-      "commit_sha": "c5297e9e69fec0779c29127c7892427e673fafd9",
+      "commit_sha": "980c0b4c5786ca710ed77276b6e55b622f340d4c",
       "local_snapshot_sha": "a0dbbc8874d860a1f2ebe33498872eaf5d74ef58",
       "upstream_subpath": "skills/remove-ai-marks",
       "local_relative": null,

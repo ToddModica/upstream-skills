@@ -13,7 +13,7 @@
 | EPUB OPF metadata / XHTML meta / embedded media | Scrub OPF, strip XHTML meta/JSON-LD, clean embedded media, Layer A (skip encrypted parts) | `clean_file.py` | Loses book metadata; rewrites archive | Yes (re-inspect) |
 | SVG metadata / XMP / embedded data URIs | Drop `<metadata>`, xmpmeta; clean embedded data URIs | `clean_file.py` | Loses SVG metadata; cleans embedded rasters | Yes (re-inspect) |
 | PDF XMP / info | exiftool `-all=` preferred | `clean_file.py` | Loses PDF metadata; degraded without exiftool | Partial |
-| DOCX / XLSX / PPTX props / customXml / embedded media | Rewrite OOXML zip, scrub text runs, clean media/ | `clean_file.py` | Loses doc properties; cleans embedded rasters | Yes |
+| DOCX / XLSX / PPTX props / customXml / Office web-extension add-in metadata / embedded media | Inspect vendor properties and references; rewrite OOXML zip, drop webextensions parts and their content-type overrides, prune dangling relationships, scrub text runs, clean media | `clean_file.py` | Loses document and add-in metadata; cleaning is refused while a matching Office owner lock file exists; cleans embedded rasters | Yes (re-inspect) |
 | ODT meta:generator | Scrub `meta.xml` | `clean_file.py` | Loses generator tag | Yes |
 | HTML generator / JSON-LD / provenance comments (AI tool name, AI-generated, C2PA, content credential) / embedded data URIs | Strip tags and comments; clean embedded data URIs | `clean_file.py` | Loses meta; cleans embedded rasters; `content` prose under a non-naming `<meta name>` is left alone | Yes |
 | Markdown AI frontmatter keys / provenance comments (AI tool name, AI-generated, C2PA, content credential) / embedded data URIs | Drop keys and comments outside code fences; clean embedded data URIs | `clean_file.py` | Loses YAML keys; cleans embedded rasters; prose values under a non-naming key are left alone | Yes |
@@ -24,6 +24,10 @@
 | Audio watermarks (silentcipher / AudioSeal / WavMark) | Destructive transform chain (tempo + pitch + EQ + low-bitrate lossy re-encode) | `/clean` (kind=av, `options.remove_audio_watermark` = true) | Alters pitch/tempo/quality/duration; returns M4A/AAC; needs `tools.ffmpeg` | Not vendor-detector-verified (we do not ship silentcipher/AudioSeal/WavMark decoders) |
 | C2PA soft binding (in-content link to manifest) | — | Out of scope (survives our metadata strip) | — | Vendor detector only |
 | Data-driven model backdoors | — | Out of scope | — | — |
+
+OOXML cleaning preserves relationships to retained document and media parts even
+when their targets use XML character references such as `&#100;` or `&amp;`.
+Relationships to removed or missing parts are pruned.
 
 ## Default pipeline
 
