@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-28T21:53:59+00:00",
+  "generated_at": "2026-10-29T22:01:32+00:00",
   "user_excluded": [],
   "sources": [
     {
@@ -456,7 +456,7 @@
       "name": "ppt-master",
       "upstream": "https://github.com/hugohe3/ppt-master.git",
       "branch": "main",
-      "commit_sha": "6fbac39e1d06a66ce3a8724b9366cb878b793f99",
+      "commit_sha": "15baa7c570f12c78cd9ac6ead897724571e32e87",
       "local_snapshot_sha": "0d3904a4ef72b8732d3d6ee23d500c21d2969425",
       "upstream_subpath": "skills/ppt-master",
       "local_relative": "ppt-master",
@@ -600,7 +600,7 @@
       "name": "grilling",
       "upstream": "https://github.com/mattpocock/skills.git",
       "branch": "main",
-      "commit_sha": "59db609eb1e18aaf59b63284d0e52255aff0c63c",
+      "commit_sha": "a496f5513d4a4cf889bc48e189e579f4b0bdf6aa",
       "local_snapshot_sha": "2ab958093e83e0ec752e6c1c5932da465bf23e0c",
       "upstream_subpath": "skills/productivity/grilling",
       "local_relative": "grilling",
@@ -616,8 +616,8 @@
       "name": "ponytail",
       "upstream": "https://github.com/DietrichGebert/ponytail.git",
       "branch": "main",
-      "commit_sha": "09c434ab73ca43761c5d8b0c5d341926c2fba710",
-      "version": "5.3.2",
+      "commit_sha": "96608e078b2d5ea607c5c3b8b5a54d1c1fba6846",
+      "version": "5.3.3",
       "upstream_subpath": null,
       "local_relative": null,
       "target": "plugins/ponytail",
