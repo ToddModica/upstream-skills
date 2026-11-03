@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-03T00:02:45+00:00",
+  "generated_at": "2026-11-03T22:32:07+00:00",
   "user_excluded": [],
   "sources": [
     {
@@ -408,7 +408,7 @@
       "name": "patent-disclosure-skill",
       "upstream": "https://github.com/handsomestWei/patent-disclosure-skill.git",
       "branch": "main",
-      "commit_sha": "0b95b547f78c2a0dd0e4e71eb43a88841c99c936",
+      "commit_sha": "9c1a3a051e867681ac25680eb606cdffd988fc2b",
       "local_snapshot_sha": "67e0cd0718dc6b0cd839719d04f73a79e3601624",
       "upstream_subpath": null,
       "local_relative": "patent-disclosure-skill",
@@ -456,7 +456,7 @@
       "name": "ppt-master",
       "upstream": "https://github.com/hugohe3/ppt-master.git",
       "branch": "main",
-      "commit_sha": "2e8238a57a3efd9e15bbb5e41ce32b95fe935af8",
+      "commit_sha": "4a68cddaf40dc87891e6b64c6a69ef46adc1110c",
       "local_snapshot_sha": "0d3904a4ef72b8732d3d6ee23d500c21d2969425",
       "upstream_subpath": "skills/ppt-master",
       "local_relative": "ppt-master",
@@ -648,7 +648,7 @@
       "name": "itasca-mcp",
       "upstream": "https://github.com/yusong652/itasca-mcp.git",
       "branch": "main",
-      "commit_sha": "9f3b633a266e6f7517a235dc0446e28b14c4665f",
+      "commit_sha": "a311a743e374460f91f453ed4a048b97c390e863",
       "local_relative": null,
       "target": "plugins/research-toolkit/assets/itasca-mcp-addon.py",
       "license": "MIT",
@@ -661,7 +661,7 @@
       "name": "diagram-design",
       "upstream": "https://github.com/cathrynlavery/diagram-design.git",
       "branch": "main",
-      "commit_sha": "0cf73c3fcc56667ad91a9a04c439ac6ccfabc9d1",
+      "commit_sha": "f24d98b05e2d7a5e68c2dedfe46e5b7173f50118",
       "local_snapshot_sha": null,
       "upstream_subpath": ".",
       "local_relative": null,
