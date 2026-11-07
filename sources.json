@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-04T22:53:49+00:00",
+  "generated_at": "2026-11-07T10:57:19+00:00",
   "user_excluded": [],
   "sources": [
     {
@@ -520,14 +520,14 @@
       "name": "shuorenhua",
       "upstream": "https://github.com/MrGeDiao/shuorenhua.git",
       "branch": "main",
-      "commit_sha": "0a001940bf1fc70f29f29a46c3587749d5badb45",
+      "commit_sha": "9b91ed9464b944258c5031993c5e7d5d4e9637a8",
       "local_snapshot_sha": "d9aaf100f23b1786c9345568ea652ac519ddcfbf",
-      "upstream_subpath": null,
+      "upstream_subpath": "skills/shuorenhua",
       "local_relative": "shuorenhua",
       "target": "plugins/writing-toolkit/skills/shuorenhua",
       "license": "MIT",
       "license_file": "LICENSE",
-      "license_scope": "skill-root",
+      "license_scope": "repository-root",
       "action": "copy",
       "reason": null
     },

@@ -87,6 +87,12 @@ MONOREPO_RULES = {
         "license_file": "LICENSE",
         "skill_prefix": "skills",
     },
+    "https://github.com/mrgediao/shuorenhua": {
+        "license": "MIT",
+        "license_file": "LICENSE",
+        "license_scope": "repository-root",
+        "skill_prefix": "skills",
+    },
 }
 
 
@@ -179,7 +185,7 @@ def main() -> None:
             if not upstream_subpath:
                 prefix = str(monorepo["skill_prefix"])
                 upstream_subpath = name if prefix in {"", "."} else f"{prefix}/{name}"
-            if not license_file:
+            if not license_file or monorepo.get("license_scope") == "repository-root":
                 license_name = str(monorepo["license"])
                 license_file = str(monorepo["license_file"])
                 license_scope = "repository-root"
