@@ -84,7 +84,7 @@ OPENAI_MODEL=gpt-image-2.5-sunburst
 # OpenAI-compatible provider knobs:
 # OPENAI_SIZE_PRESET=auto
 # OPENAI_RESPONSE_FORMAT=auto
-# GPT Image: auto / omit / low / medium / high; xhigh / max only for the two 2.5 models
+# GPT Image: auto / omit / low / medium / high; xhigh / max only for the 2.5 and 2.6 models
 # OPENAI_QUALITY=auto
 # Allowed values: png / jpeg / webp
 # OPENAI_OUTPUT_FORMAT=png
@@ -109,12 +109,13 @@ Current process environment wins over `.env`.
 
 OpenAI backend notes:
 - `gpt-image-2.5-sunburst` is the default OpenAI model. `gpt-image-2.5-flare` shares its token rates; OpenAI positions Sunburst for editing precision and Flare for fast everyday generation ([models](https://developers.openai.com/api/docs/models/gpt-image-2.5-sunburst)).
+- `gpt-image-2.6-sunburst` and `gpt-image-2.6-flare` take the same handling as the 2.5 models below (sizes, `xhigh`/`max`, transparency, no `OPENAI_INPUT_FIDELITY`) and the same token rates, but have no Batch endpoint. Measured on 2026-11-05 at `1536x864`: `quality=medium` (the `1K` default) returned 924 output tokens versus 280 for 2.5; `high` returned 1078 for both ([models](https://developers.openai.com/api/docs/models/gpt-image-2.6-sunburst)).
 - Requests are sent with plain `requests.post()` to improve compatibility with
   OpenAI-compatible proxies that block the OpenAI SDK's `httpx` transport.
-- For `gpt-image-2`, `image_size=512px` means a low-quality draft preset, not a literal 512px edge. The model requires both edges to be multiples of 16px, a long:short ratio no greater than 3:1, and total pixels between 655,360 and 8,294,400. The 2.5 models share these rules and sizes; unlisted ratios are fitted to them, so `4:1` at 1K becomes `1776x592` (3:1).
-- `OPENAI_BACKGROUND=transparent` is supported by `gpt-image-2.5-sunburst` and `gpt-image-2.5-flare`, including their published snapshots. For `gpt-image-2` it is in preview: a key without preview access gets HTTP 400 `Transparent background is not supported for this model.`, which fails the item without retries. Use PNG (the default) or WebP, not JPEG.
-- `OPENAI_QUALITY=xhigh` and `max` are accepted only for `gpt-image-2.5-sunburst` and `gpt-image-2.5-flare`, including their published snapshots; older GPT Image models retain `auto/omit/low/medium/high`. See the [Images API parameters](https://developers.openai.com/api/reference/resources/images/methods/generate).
-- For reference edits, `OPENAI_INPUT_FIDELITY` accepts `high/low` on `gpt-image-1` and `gpt-image-1.5`, but only `low` on `gpt-image-1-mini`. Leave it unset for `gpt-image-2` and the two 2.5 models (including snapshots); this backend keeps the existing omission requirement for 2.5 because its support is not explicitly documented in the [edit API parameters](https://developers.openai.com/api/reference/resources/images/methods/edit).
+- For `gpt-image-2`, `image_size=512px` means a low-quality draft preset, not a literal 512px edge. The model requires both edges to be multiples of 16px, a long:short ratio no greater than 3:1, and total pixels between 655,360 and 8,294,400. The 2.5 and 2.6 models share these rules and sizes; unlisted ratios are fitted to them, so `4:1` at 1K becomes `1776x592` (3:1).
+- `OPENAI_BACKGROUND=transparent` is supported by the 2.5 and 2.6 Sunburst and Flare models, including their published snapshots. For `gpt-image-2` it is in preview: a key without preview access gets HTTP 400 `Transparent background is not supported for this model.`, which fails the item without retries. Use PNG (the default) or WebP, not JPEG.
+- `OPENAI_QUALITY=xhigh` and `max` are accepted only for the 2.5 and 2.6 Sunburst and Flare models, including their published snapshots; older GPT Image models retain `auto/omit/low/medium/high`. See the [Images API parameters](https://developers.openai.com/api/reference/resources/images/methods/generate).
+- For reference edits, `OPENAI_INPUT_FIDELITY` accepts `high/low` on `gpt-image-1` and `gpt-image-1.5`, but only `low` on `gpt-image-1-mini`. Leave it unset for `gpt-image-2` and the 2.5 and 2.6 models (including snapshots); the API rejects it on 2.6 with HTTP 400, and this backend keeps the omission requirement for 2.5 because its support is not explicitly documented in the [edit API parameters](https://developers.openai.com/api/reference/resources/images/methods/edit).
 - OpenAI shut down `gpt-image-1` on 2026-10-23 and DALL·E 2/3 on 2026-05-12, and removes `gpt-image-1-mini`, `gpt-image-1.5` (including `gpt-image-1.5-2025-12-16`) and `chatgpt-image-latest` on 2026-12-01, naming the two 2.5 models as replacements. The backend keeps their size and option handling for OpenAI-compatible providers that still serve them; see [deprecations](https://developers.openai.com/api/docs/deprecations).
 - If `OPENAI_OUTPUT_FORMAT=jpeg` or `webp`, generated files use `.jpg` or `.webp` extensions instead of `.png`.
 - OpenAI-compatible providers that reject OpenAI-specific fields can use `OPENAI_RESPONSE_FORMAT=omit`, `OPENAI_QUALITY=omit`, and `OPENAI_SIZE_PRESET=<preset>`. Valid response formats are `auto`, `b64_json`, `url`, and `omit`; valid size presets are `auto`, `legacy`, `gpt-image`, `gpt-image-2`, and `dall-e-2`.
@@ -158,6 +159,22 @@ MINIMAX_API_KEY=your-api-key
 Validates the file behind every `Generated` row before skipping it, iterates retryable rows with bounded adaptive concurrency, and writes each status atomically; a missing or corrupt file returns to `Failed`, and persistent rate limits end the run as retryable `Failed`. Options: `--concurrency` (default `IMAGE_CONCURRENCY` or 3; halves on rate limit, min 1), `--image_size`, `--output`/`-o`, `--backend`/`-b`, `--model`/`-m`, `--list-backends`. Interrupting is safe (completed items stay `Generated`); the Markdown sidecar re-renders on completion, or run `--render-md` after an interruption. Configuration: process environment first, then the first `.env` in cwd, the skill directory, the clone root, `~/.ppt-master/.env` — `IMAGE_BACKEND` (required; `--list-backends` shows the set and support tiers), `IMAGE_CONCURRENCY`, provider-specific `{PROVIDER}_API_KEY` / `_BASE_URL` / `_MODEL` (never `IMAGE_API_KEY` / `IMAGE_MODEL` / `IMAGE_BASE_URL`), and for OpenAI-compatible platforms `OPENAI_SIZE_PRESET` (`auto|legacy|gpt-image|gpt-image-2|dall-e-2`), `OPENAI_RESPONSE_FORMAT` (`auto|b64_json|url|omit`), `OPENAI_QUALITY` (`auto|omit|low|medium|high|xhigh|max|standard|hd`; `xhigh/max` only for the two 2.5 models and their snapshots) under `IMAGE_BACKEND=openai`; see `.env.example`. The single-image form `image_gen.py "prompt" --filename …` remains for ad-hoc re-rolls.
 
 **Compatibility**: legacy `type` values read as `background` → `hero_page` + no type, `hero` → `hero_page` + Primitive A, `portrait` → `local` + Primitive B, `typography` → `hero_page` + `embedded` + Primitive C; a missing `page_role` is `local`, a missing `text_policy` is `none` (one aggregate warning per manifest); an existing manifest lacking `deck_rendering` or an item lacking `type` replays its assembled `prompt` verbatim without reconstruction; a legacy `deck_style_anchor` or `deck_palette` never overrides `deck_rendering` / `color_scheme`; legacy `page_role: full_page` reads as `hero_page`.
+
+## `slice_images.py`
+
+Slice a contact sheet with `--grid RxC`, optionally naming the outputs with
+`--names` or `--prefix` and choosing their directory with `--output`.
+All outputs are checked before any slice is written. An output that resolves to
+the source sheet or shares its file identity (including a hard link) is rejected;
+choose different names, a prefix, or an output directory. Output symlinks,
+including dangling links, are also rejected to preserve both the link and its
+referent: remove the output symlink or choose a regular output path before
+rerunning. Existing ordinary slices are overwritten, so regenerating a sheet
+and rerunning the same names refreshes the files used by the image manifest.
+Before slicing, 16-bit grayscale is reduced to 8-bit by retaining each sample's
+high byte (`0..65535` → `0..255`), before RGB/RGBA conversion. This uses the
+encoded bit depth, never the image's observed brightness range. A PNG grayscale
+transparent sample is matched at full depth before reducing the color values.
 
 ## `image_treat.py`
 
@@ -203,6 +220,8 @@ fixed order: brightness → contrast → tone treatment → blur → fit. Desatu
 mutually exclusive. At least one option must produce a real change; animated
 sources are rejected rather than reduced to one frame, while a camera
 multi-picture JPEG (MPO) contributes its primary frame.
+Before treatments, 16-bit grayscale uses the same depth normalization as
+[`slice_images.py`](#slice_imagespy), including for a `--fit`-only derivative.
 
 Both input and output are bare filenames directly under `images/`; output must
 be a new `.png` file, or a new `.jpg` file when the source is opaque (a
@@ -291,7 +310,7 @@ profile; Pillow and numpy only.
 
 ```bash
 python3 scripts/image_layers.py check <project_path> --page-image images/source-pages/01.png \
-  --layer images/01_plate.png [--ratio 0.8]
+  --layer images/01_plate.png [--occlusion-mask images/01_occlusion.png] [--ratio 0.8]
 python3 scripts/image_layers.py diff-matte <project_path> --page-image images/source-pages/01.png \
   --base images/01_base.png --out images/01_subject.png [--ocr analysis/ocr/01.json] [--threshold 60]
 python3 scripts/image_layers.py mono-matte <project_path> --plate images/01_plate_key.png --key "#FF00FF" \
@@ -303,9 +322,22 @@ on a 640-px-wide copy, and at every shift of 5 and 10 px in x and y. It prints
 the origin difference, the best shifted difference, and the best offset in page
 pixels, then exits `0` (`Registered`) when the origin difference is at most
 `--ratio` times the best shifted one, otherwise `3`. Opacity comes from real
-alpha, else from a flat `#FF00FF` or `#00FF00` key. A layer that is placed
-correctly but completes parts the page shows hidden behind another object still
-passes; z-order is decided by the page assembly, not by this check.
+alpha whenever any pixel has alpha below 20, regardless of its share of the
+image; pixels with alpha above 200 enter the opacity mask shared with
+`merge-base`. When no pixel has alpha below 20, flat `#FF00FF` or `#00FF00`
+key detection remains active, including near-opaque RGBA inputs such as an
+image whose alpha is uniformly 250. When a layer completes parts hidden behind
+upper objects in the page, supply `--occlusion-mask`: a grayscale image at the
+canonical page dimensions, with nonzero pixels marking those actual occluders
+and zero pixels elsewhere. Only originally visible layer pixels are compared,
+and shifted samples landing behind an occluder are excluded too. When resizing,
+samples whose bicubic kernel support touches an occluder are also excluded,
+so thin occluders and their resampling fringes cannot enter the score. Registration
+uses the same ratio and shifts; without a mask it compares all opaque pixels
+and does not infer occlusion from color differences. A wrong-size mask, no
+visible opaque pixels, or no shifted comparison pixels exits `1` with a repair
+hint. The mask is comparison evidence only; the complete layer is unchanged,
+and the page assembly must still place the occluders above it.
 
 `diff-matte` writes an RGBA layer from the page's own pixels: a pixel is kept
 when its RGB distance to the resized base exceeds `--threshold`, outside the
@@ -316,9 +348,12 @@ matches the background behind them.
 
 `mono-matte` cuts one single-color graphic (a white logo or wordmark) from a
 raw flat-key plate, before keying: inside `--box` (canvas px, scaled to the
-plate), alpha is the minimum of the channels the key lacks (below 128 in the
-key: G for `#FF00FF`, R and B for `#00FF00`), normalized so the 99th percentile
-is opaque, and every pixel takes `--fill`. Key color cannot bleed into the
+plate), each low channel (below 128 in the key: G for `#FF00FF`, R and B for
+`#00FF00`) has its own key value subtracted and negative differences clipped
+to zero. Alpha is the minimum of those differences, normalized so the 99th
+percentile is opaque, and every pixel takes `--fill`. Nonzero low-channel keys
+such as `#FF40FF` and `#20FF20` therefore leave zero alpha on the key field.
+Key color cannot bleed into the
 edges, and interior gaps the generator painted with the key become
 transparent. It prints the placement box; a key that lacks no channel exits `1`.
 
