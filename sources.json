@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-07T21:05:36+00:00",
+  "generated_at": "2026-11-08T21:22:20+00:00",
   "user_excluded": [],
   "sources": [
     {
@@ -408,7 +408,7 @@
       "name": "patent-disclosure-skill",
       "upstream": "https://github.com/handsomestWei/patent-disclosure-skill.git",
       "branch": "main",
-      "commit_sha": "3fc4b4c4b5cb9fbe41ddacb8ce72c4e0f3b9d7e7",
+      "commit_sha": "b4bbec6f0a1c3c32a904faabeb249639c0b30d98",
       "local_snapshot_sha": "67e0cd0718dc6b0cd839719d04f73a79e3601624",
       "upstream_subpath": null,
       "local_relative": "patent-disclosure-skill",
@@ -456,7 +456,7 @@
       "name": "ppt-master",
       "upstream": "https://github.com/hugohe3/ppt-master.git",
       "branch": "main",
-      "commit_sha": "f6cfd05fe1e3f2144906c5f9ae8ec5d91612eb0b",
+      "commit_sha": "ce92fb43e4ade9c701f4c869e286f13fce743c72",
       "local_snapshot_sha": "0d3904a4ef72b8732d3d6ee23d500c21d2969425",
       "upstream_subpath": "skills/ppt-master",
       "local_relative": "ppt-master",
@@ -661,7 +661,7 @@
       "name": "diagram-design",
       "upstream": "https://github.com/cathrynlavery/diagram-design.git",
       "branch": "main",
-      "commit_sha": "e57eda6102a19444538ebd611d39534fad65b663",
+      "commit_sha": "a928d8a421080b8d197789a16588f2d1ce06dee7",
       "local_snapshot_sha": null,
       "upstream_subpath": ".",
       "local_relative": null,
