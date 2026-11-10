@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-08T21:22:20+00:00",
+  "generated_at": "2026-11-10T00:51:43+00:00",
   "user_excluded": [],
   "sources": [
     {
@@ -216,7 +216,7 @@
       "name": "humanizer",
       "upstream": "https://github.com/blader/humanizer.git",
       "branch": "main",
-      "commit_sha": "0ef9fe5bc3572734fd3ae6c448fe00a30cd5dcf0",
+      "commit_sha": "6042f310a7e3eaf9bdaf22f2ec6bb32eb840984e",
       "local_snapshot_sha": "1b48564898e999219882660237fde01bf4843a0f",
       "upstream_subpath": null,
       "local_relative": "humanizer",
@@ -456,7 +456,7 @@
       "name": "ppt-master",
       "upstream": "https://github.com/hugohe3/ppt-master.git",
       "branch": "main",
-      "commit_sha": "ce92fb43e4ade9c701f4c869e286f13fce743c72",
+      "commit_sha": "3c6ffd0ee6d6e31aa9ca316bd157173802e3526f",
       "local_snapshot_sha": "0d3904a4ef72b8732d3d6ee23d500c21d2969425",
       "upstream_subpath": "skills/ppt-master",
       "local_relative": "ppt-master",
@@ -661,7 +661,7 @@
       "name": "diagram-design",
       "upstream": "https://github.com/cathrynlavery/diagram-design.git",
       "branch": "main",
-      "commit_sha": "a928d8a421080b8d197789a16588f2d1ce06dee7",
+      "commit_sha": "f2496acbde9f45ccb55c24d4f75210c8a1355df8",
       "local_snapshot_sha": null,
       "upstream_subpath": ".",
       "local_relative": null,
