@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-11T23:43:27+00:00",
+  "generated_at": "2026-11-12T22:52:25+00:00",
   "user_excluded": [],
   "sources": [
     {
@@ -456,7 +456,7 @@
       "name": "ppt-master",
       "upstream": "https://github.com/hugohe3/ppt-master.git",
       "branch": "main",
-      "commit_sha": "e2820d326d049f1fcbe90523983def3d52280233",
+      "commit_sha": "01fe549371b98f44be22cd337bbc911013452f09",
       "local_snapshot_sha": "0d3904a4ef72b8732d3d6ee23d500c21d2969425",
       "upstream_subpath": "skills/ppt-master",
       "local_relative": "ppt-master",
@@ -600,7 +600,7 @@
       "name": "grilling",
       "upstream": "https://github.com/mattpocock/skills.git",
       "branch": "main",
-      "commit_sha": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+      "commit_sha": "5863806dd4e15c63174bee4e7515a4256792ecfa",
       "local_snapshot_sha": "2ab958093e83e0ec752e6c1c5932da465bf23e0c",
       "upstream_subpath": "skills/productivity/grilling",
       "local_relative": "grilling",
@@ -661,7 +661,7 @@
       "name": "diagram-design",
       "upstream": "https://github.com/cathrynlavery/diagram-design.git",
       "branch": "main",
-      "commit_sha": "f2496acbde9f45ccb55c24d4f75210c8a1355df8",
+      "commit_sha": "f6db0decea96de66b901331a0f79a8d4b147ebae",
       "local_snapshot_sha": null,
       "upstream_subpath": ".",
       "local_relative": null,
