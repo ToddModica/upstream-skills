@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-17T01:05:29+00:00",
+  "generated_at": "2026-11-17T11:37:16+00:00",
   "user_excluded": [],
   "sources": [
     {
@@ -72,7 +72,7 @@
       "name": "academic-paper",
       "upstream": "https://github.com/Imbad0202/academic-research-skills.git",
       "branch": "main",
-      "commit_sha": "23bd688bbc121da6ae98ec3c4d4a7675cefc4c83",
+      "commit_sha": "84566b363b4928653606704da19f69f5d70ff485",
       "local_snapshot_sha": "b7f88d969bb77b4f0a6d6c42eea24a56092f47fa",
       "upstream_subpath": "academic-paper",
       "local_relative": "academic-paper",
@@ -88,7 +88,7 @@
       "name": "academic-paper-reviewer",
       "upstream": "https://github.com/Imbad0202/academic-research-skills.git",
       "branch": "main",
-      "commit_sha": "23bd688bbc121da6ae98ec3c4d4a7675cefc4c83",
+      "commit_sha": "84566b363b4928653606704da19f69f5d70ff485",
       "local_snapshot_sha": "865db303118777e246582654cb6bbdc1799a5083",
       "upstream_subpath": "academic-paper-reviewer",
       "local_relative": "academic-paper-reviewer",
@@ -104,7 +104,7 @@
       "name": "academic-pipeline",
       "upstream": "https://github.com/Imbad0202/academic-research-skills.git",
       "branch": "main",
-      "commit_sha": "23bd688bbc121da6ae98ec3c4d4a7675cefc4c83",
+      "commit_sha": "84566b363b4928653606704da19f69f5d70ff485",
       "local_snapshot_sha": "e4428cf5d37de2aaf6558ff93482d3c1bd0f7674",
       "upstream_subpath": "academic-pipeline",
       "local_relative": "academic-pipeline",
@@ -184,7 +184,7 @@
       "name": "deep-research",
       "upstream": "https://github.com/Imbad0202/academic-research-skills.git",
       "branch": "main",
-      "commit_sha": "23bd688bbc121da6ae98ec3c4d4a7675cefc4c83",
+      "commit_sha": "84566b363b4928653606704da19f69f5d70ff485",
       "local_snapshot_sha": "1ce2681d346b1715f0793a7f87eb487941f9beee",
       "upstream_subpath": "deep-research",
       "local_relative": "deep-research",
