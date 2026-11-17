@@ -21,6 +21,8 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: '3.11'
+      - name: Refresh bundled MCP server pins
+        run: python scripts/update_mcp_pins.py
       - name: Refresh source locks
         id: locks
         run: python scripts/update_sources.py || test $? -eq 2
@@ -33,7 +35,7 @@ jobs:
           plugins=""
           # Ponytail preserves the version shared by all of its upstream platform
           # manifests; locally maintained plugins use Marketplace patch versions.
-          for plugin in research-toolkit writing-toolkit codex-utility-toolkit watermarks-remover no-negative-echo; do
+          for plugin in research-toolkit writing-toolkit codex-utility-toolkit watermarks-remover no-negative-echo playwright-mcp; do
             if echo "$changed" | grep -q "^plugins/$plugin/"; then plugins="$plugins $plugin"; fi
           done
           test -z "$plugins" || python scripts/bump_versions.py $plugins

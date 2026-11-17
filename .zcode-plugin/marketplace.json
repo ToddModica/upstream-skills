@@ -40,6 +40,12 @@
       "source": "./plugins/no-negative-echo",
       "description": "Keep rejected wording and session residue out of final deliverables.",
       "category": "Productivity"
+    },
+    {
+      "name": "playwright-mcp",
+      "source": "./plugins/playwright-mcp",
+      "description": "Control a real browser through Microsoft's Playwright MCP server, with Firefox as the default browser.",
+      "category": "Productivity"
     }
   ]
 }

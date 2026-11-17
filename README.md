@@ -19,7 +19,7 @@ Tavotto 通过其官方 `plugin-stable` 分支按需拉取，许可证为 **AGPL
 - 专利与 SciPilot：[`patent-disclosure-skill`](https://github.com/handsomestWei/patent-disclosure-skill)；[`scipilot-cite-skill`](https://github.com/Haojae/scipilot-cite-skill)、[`scipilot-figure-skill`](https://github.com/Haojae/scipilot-figure-skill)、[`scipilot-writing-skill`](https://github.com/Haojae/scipilot-writing-skill)。
 - 写作：[`humanizer`](https://github.com/blader/humanizer)、[`humanizer-zh`](https://github.com/op7418/Humanizer-zh)、[`shuorenhua`](https://github.com/MrGeDiao/shuorenhua)、[`stop-slop`](https://github.com/hardikpandya/stop-slop)、[`anti-defensive-writing`（中文）与 `anti-defensive-writing-en`（英文）](https://github.com/Adkid-Zephyr/anti-defensive-writing-Skill)。
 - 开发与文档：[`bilibili-page-reader`、`powershell-safe-invocation`](https://github.com/Misaka-Mikoto-Tech/agent-skills)、[`design-taste-frontend`](https://github.com/Leonxlnx/taste-skill)、[`ppt-master`](https://github.com/hugohe3/ppt-master)、[`grilling`](https://github.com/mattpocock/skills)。
-- 插件与 MCP：[`ponytail`](https://github.com/DietrichGebert/ponytail)、[`watermarks-remover`](https://github.com/guillaumemeyer/watermarks-remover)、[`no-negative-echo`](https://github.com/LB623/no-negative-echo)、[`itasca-mcp`](https://github.com/yusong652/itasca-mcp)、[`Tavotto`](https://github.com/Tavotto/Tavotto)。Tavotto 的插件来源固定为上游 `plugin-stable` 发布分支。
+- 插件与 MCP：[`ponytail`](https://github.com/DietrichGebert/ponytail)、[`watermarks-remover`](https://github.com/guillaumemeyer/watermarks-remover)、[`no-negative-echo`](https://github.com/LB623/no-negative-echo)、[`itasca-mcp`](https://github.com/yusong652/itasca-mcp)、[`Playwright MCP`](https://github.com/microsoft/playwright-mcp)、[`Tavotto`](https://github.com/Tavotto/Tavotto)。Tavotto 的插件来源固定为上游 `plugin-stable` 发布分支。
 - CAD 运行时：专利工具的 STEP/SVG 处理使用 [`CadQuery`](https://github.com/CadQuery/cadquery)。
 - 图示设计：[`Diagram Design`](https://github.com/cathrynlavery/diagram-design)，MIT 许可证，独立插件归入 `Creativity`，来源为官方 `main` 分支。
 
@@ -45,6 +45,7 @@ codex plugin add codex-utility-toolkit@research-toolkit-marketplace
 codex plugin add ponytail@research-toolkit-marketplace
 codex plugin add watermarks-remover@research-toolkit-marketplace
 codex plugin add no-negative-echo@research-toolkit-marketplace
+codex plugin add playwright-mcp@research-toolkit-marketplace
 codex plugin add tavotto@research-toolkit-marketplace
 codex plugin add diagram-design@research-toolkit-marketplace
 ```
@@ -107,6 +108,18 @@ curl.exe -s http://127.0.0.1:8765/health
 ```
 
 插件内 `Start-Service.ps1` 支持按需隐藏启动，使用结束后保持运行。远程服务地址和鉴权通过本机环境变量配置。
+
+### playwright-mcp
+
+Microsoft Playwright MCP 的封装插件：Codex 通过 stdio 驱动真实浏览器，完成导航、读取元素快照、点击、输入、上传文件、截图，并查看控制台消息与网络请求。默认浏览器为 Firefox，附带 `playwright-browser` Skill 说明页面操作流程。插件只包含本市场的清单、MCP 配置与 Skill；`@playwright/mcp` 按 `.mcp.json` 里固定的版本在启动时由 npm 获取，无需 API Key。
+
+首次启动会下载 Playwright 自带的浏览器构建（不是系统里已安装的 Firefox 或 Chrome）。下载慢或不可达时，先设置镜像再启动：
+
+```powershell
+$env:PLAYWRIGHT_DOWNLOAD_HOST = 'https://npmmirror.com/mirrors/playwright'
+```
+
+在 `plugins/playwright-mcp/.mcp.json` 中，把 `--browser=firefox` 换成 `chromium`、`webkit` 或 `msedge` 可切换引擎；追加 `--headless` 无界面运行，追加 `--isolated` 则每次会话结束后丢弃登录态。有头模式下浏览器窗口可见，截图与下载写入 MCP 服务的工作目录。
 
 ### Tavotto
 
@@ -191,6 +204,7 @@ codex plugin add codex-utility-toolkit@research-toolkit-marketplace
 codex plugin add ponytail@research-toolkit-marketplace
 codex plugin add watermarks-remover@research-toolkit-marketplace
 codex plugin add no-negative-echo@research-toolkit-marketplace
+codex plugin add playwright-mcp@research-toolkit-marketplace
 codex plugin add tavotto@research-toolkit-marketplace
 ```
 
@@ -200,12 +214,13 @@ codex plugin add tavotto@research-toolkit-marketplace
 
 `.github/workflows/sync-sources.yml` 每天北京时间 01:47 检查上游，也支持手动触发。流程会：
 
-1. 更新 `sources.json` 中的上游 commit SHA；
-2. 只复制已确认可再分发的 Skill、插件或指定子目录；
-3. 保留许可证并拒绝越界路径、符号链接和凭据类文件；
-4. 更新发生内容变化的插件补丁版本；
-5. 校验 Marketplace、全部插件清单、SKILL.md、MCP 配置和来源锁；
-6. 只在全部校验通过且内容发生变化时提交。
+1. 刷新随插件分发的 MCP 服务版本锁（当前为 Playwright MCP 的 npm 版本）；
+2. 更新 `sources.json` 中的上游 commit SHA；
+3. 只复制已确认可再分发的 Skill、插件或指定子目录；
+4. 保留许可证并拒绝越界路径、符号链接和凭据类文件；
+5. 更新发生内容变化的插件补丁版本；
+6. 校验 Marketplace、全部插件清单、SKILL.md、MCP 配置和来源锁；
+7. 只在全部校验通过且内容发生变化时提交。
 
 ## 卸载
 
@@ -216,6 +231,7 @@ codex plugin remove codex-utility-toolkit@research-toolkit-marketplace
 codex plugin remove ponytail@research-toolkit-marketplace
 codex plugin remove watermarks-remover@research-toolkit-marketplace
 codex plugin remove no-negative-echo@research-toolkit-marketplace
+codex plugin remove playwright-mcp@research-toolkit-marketplace
 codex plugin remove tavotto@research-toolkit-marketplace
 codex plugin marketplace remove research-toolkit-marketplace
 ```
@@ -249,6 +265,7 @@ ZCode 可使用根目录 `.zcode-plugin/marketplace.json`，Codex 使用 `.agent
 ## 维护者校验
 
 ```powershell
+python .\scripts\update_mcp_pins.py
 python .\scripts\update_sources.py
 python .\scripts\sync_sources.py --remote
 python .\scripts\validate_catalog.py

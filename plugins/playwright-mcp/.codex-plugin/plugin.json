@@ -1,0 +1,23 @@
+{
+  "name": "playwright-mcp",
+  "version": "0.1.0",
+  "description": "Control a real browser through Microsoft's Playwright MCP server, with Firefox as the default browser.",
+  "author": {
+    "name": "ToddModica",
+    "url": "https://github.com/ToddModica"
+  },
+  "repository": "https://github.com/ToddModica/upstream-skills",
+  "license": "MIT",
+  "interface": {
+    "displayName": "Playwright Browser",
+    "shortDescription": "Drive a real browser with Microsoft Playwright MCP.",
+    "longDescription": "Bundles Microsoft's Playwright MCP server (npx @playwright/mcp) with Firefox as the default browser. The server runs locally over stdio and exposes navigation, element snapshots, clicks, typing, screenshots, console and network inspection, and script evaluation. No API key is required; Playwright downloads its own browser build on first launch, and PLAYWRIGHT_DOWNLOAD_HOST can point at a closer mirror.",
+    "developerName": "ToddModica",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": [
+      "Open a page in the browser, interact with it, and report what you see."
+    ]
+  },
+  "mcpServers": "./.mcp.json"
+}

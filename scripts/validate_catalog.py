@@ -9,7 +9,7 @@ from pathlib import Path
 from pathlib import PurePosixPath
 
 ROOT = Path(__file__).resolve().parents[1]
-PLUGINS = ("research-toolkit", "writing-toolkit", "codex-utility-toolkit", "ponytail", "no-negative-echo")
+PLUGINS = ("research-toolkit", "writing-toolkit", "codex-utility-toolkit", "ponytail", "no-negative-echo", "playwright-mcp")
 REQUIRED_SKILLS = {
     "research-toolkit": {
         "academic-paper",
@@ -106,6 +106,18 @@ def main() -> None:
         fail("research-toolkit: invalid itasca-mcp configuration")
     if not (ROOT / "plugins/research-toolkit/assets/itasca-mcp-addon.py").is_file():
         fail("research-toolkit: ITASCA bridge addon is missing")
+    playwright_root = ROOT / "plugins/playwright-mcp"
+    playwright_mcp = json.loads((playwright_root / ".mcp.json").read_text(encoding="utf-8"))
+    playwright_server = playwright_mcp.get("mcpServers", {}).get("playwright", {})
+    playwright_args = playwright_server.get("args", [])
+    pinned_package = re.compile(r"^@playwright/mcp@\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$")
+    if playwright_server.get("command") != "npx" or not any(pinned_package.match(str(arg)) for arg in playwright_args):
+        fail("playwright-mcp: the Playwright MCP server must run from a pinned npx package")
+    if "--browser=firefox" not in playwright_args:
+        fail("playwright-mcp: Firefox must stay the default browser")
+    packaged_playwright_skills = {path.parent.name for path in (playwright_root / "skills").glob("*/SKILL.md")}
+    if packaged_playwright_skills != {"playwright-browser"}:
+        fail("playwright-mcp: bundled Skill set does not match the required set")
     sources = json.loads((ROOT / "sources.json").read_text(encoding="utf-8"))
     names = [item["name"] for item in sources["sources"]]
     if len(names) != len(set(names)):
