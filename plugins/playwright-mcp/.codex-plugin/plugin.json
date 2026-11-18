@@ -1,6 +1,6 @@
 {
   "name": "playwright-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Control a real browser through Microsoft's Playwright MCP server, with Firefox as the default browser.",
   "author": {
     "name": "ToddModica",
