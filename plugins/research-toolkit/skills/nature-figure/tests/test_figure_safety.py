@@ -57,6 +57,12 @@ class PdfTextAuditTests(unittest.TestCase):
         result = PDF_AUDIT.audit_pdf(fake_pdf(b"0 0 m 10 10 l S"))
         self.assertFalse(result["auditable"])
 
+    def test_plain_pdf_reports_nonzero_character_spacing(self):
+        result = PDF_AUDIT.audit_pdf(fake_pdf(b"BT /F1 7 Tf 0.5 Tc (Label) Tj ET"))
+        self.assertTrue(result["auditable"])
+        self.assertEqual(result["spacing_issue_count"], 1)
+        self.assertEqual(result["spacing_issues"][0]["char_spacing"], 0.5)
+
 
 class SourceSafetyTests(unittest.TestCase):
     def findings(self, source: str):
@@ -210,6 +216,20 @@ require_matplotlib_panel_alignment(fig, strict=True)
             'ggsave("figure.pdf", p, width = 3.5, height = 2.5)\n'
         )
         self.assertEqual(VALIDATOR.check_editable_text(source, "r").level, "FAIL")
+
+    def test_r_ggsave_svglite_device_counts_as_editable_text(self):
+        source = (
+            'ggsave("figure.svg", plot = p, width = 3.5, height = 2.5, device = svglite::svglite)\n'
+            'ggsave("figure.pdf", plot = p, width = 3.5, height = 2.5, device = grDevices::cairo_pdf)\n'
+        )
+        self.assertEqual(VALIDATOR.check_editable_text(source, "r").level, "PASS")
+
+    def test_r_ggsave_svglite_string_device_counts_as_editable_text(self):
+        source = (
+            'ggsave("figure.svg", plot = p, device = "svglite")\n'
+            'ggsave("figure.pdf", plot = p, device = "cairo_pdf")\n'
+        )
+        self.assertEqual(VALIDATOR.check_editable_text(source, "r").level, "PASS")
 
 
 class NumericalSafetyTests(unittest.TestCase):
