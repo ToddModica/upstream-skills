@@ -151,9 +151,9 @@ def main() -> None:
                     fail(f"{name}: repository-level UPSTREAM_LICENSE is missing")
     no_echo_root = ROOT / "plugins/no-negative-echo"
     no_echo_manifest = json.loads((no_echo_root / ".codex-plugin/plugin.json").read_text(encoding="utf-8"))
-    if no_echo_manifest.get("hooks") != "./hooks/hooks.json":
+    if no_echo_manifest.get("hooks") != "./hooks/claude-codex-hooks.json":
         fail("no-negative-echo: expected lifecycle hooks are not declared")
-    if not (no_echo_root / "hooks/hooks.json").is_file() or not (no_echo_root / "hooks/no-negative-echo.js").is_file():
+    if not (no_echo_root / no_echo_manifest["hooks"]).is_file() or not (no_echo_root / "hooks/no-negative-echo.js").is_file():
         fail("no-negative-echo: lifecycle hook is missing")
     openai_yaml = (no_echo_root / "skills/no-negative-echo/agents/openai.yaml").read_text(encoding="utf-8")
     if "allow_implicit_invocation: false" not in openai_yaml:

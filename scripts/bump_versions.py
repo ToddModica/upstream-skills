@@ -22,6 +22,12 @@ def main() -> None:
         payload = json.loads(path.read_text(encoding="utf-8"))
         payload["version"] = bump(payload["version"])
         path.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        if name == "no-negative-echo":
+            for host in (".claude-plugin", ".zcode-plugin"):
+                manifest = path.parents[1] / host / "plugin.json"
+                data = json.loads(manifest.read_text(encoding="utf-8"))
+                data["version"] = payload["version"]
+                manifest.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
         print(f"{name} -> {payload['version']}")
 
 

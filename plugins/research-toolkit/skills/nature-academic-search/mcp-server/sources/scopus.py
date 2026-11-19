@@ -38,7 +38,7 @@ class ScopusSource:
         rows: int = 5,
         view: str | None = None,
         refresh: bool | int = False,
-        subscriber: bool = True,
+        subscriber: bool = False,
     ) -> dict[str, Any]:
         """Search Scopus documents and return only the requested first page."""
         if not query or not query.strip():

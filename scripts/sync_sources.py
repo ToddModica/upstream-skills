@@ -10,6 +10,8 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
+import shlex
 import shutil
 import stat
 import subprocess
@@ -224,7 +226,43 @@ def apply_patent_disclosure_skill_overrides(target: Path) -> None:
     )
 
 
+def apply_academic_search_overrides(target: Path) -> None:
+    server = target / "mcp-server"
+    tool = server / "academic_search_server.py"
+    for path in (tool, server / "sources/scopus.py"):
+        _patch_skill_text(path, "subscriber: bool = True,", "subscriber: bool = False,",
+                         "subscriber: bool = False,", f"Scopus defaults in {path.name}")
+    doc = tool.read_text(encoding="utf-8").replace(
+        "Whether to use subscriber cursor navigation.",
+        "Select COMPLETE when True (requires institutional entitlement). Default: STANDARD.",
+    )
+    tool.write_text(doc, encoding="utf-8")
+
+    snippet = target / "config/mcp-snippet.json"
+    config = json.loads(snippet.read_text(encoding="utf-8"))
+    args = config["mcpServers"]["academic-search"]["args"]
+    requirements = (server / "requirements.txt").read_text(encoding="utf-8").splitlines()
+    if "--with-requirements" not in args:
+        index = args.index("python")
+        args[index:index] = ["--with-requirements", "requirements.txt"]
+    # Keep extra upstream --with packages until the requirements file lists them.
+    for i in reversed(range(len(args) - 1)):
+        if args[i] == "--with" and args[i + 1] in requirements:
+            del args[i:i + 2]
+    snippet.write_text(json.dumps(config, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+    command = "uv " + shlex.join(args).replace("'<MCP_SERVER_DIR>'", "<mcp-server>")
+    for path in (server / "README.md", target / "static/core/routing-and-ops.md"):
+        doc = path.read_text(encoding="utf-8")
+        doc = re.sub(r'^uv run --no-project --directory <mcp-server> --with .* python academic_search_server\.py$',
+                     lambda _: command, doc, flags=re.MULTILINE)
+        path.write_text(doc, encoding="utf-8")
+
+
 def apply_marketplace_overrides(name: str, target: Path) -> None:
+    if name == "nature-academic-search":
+        apply_academic_search_overrides(target)
+        return
     if name in DEFENSIVE_WRITING_GUARDRAILS:
         skill = target / "SKILL.md"
         set_skill_description(skill, DEFENSIVE_WRITING_DESCRIPTIONS[name])
@@ -369,6 +407,13 @@ def main() -> None:
                 record["version"] = upstream_version
                 args.sources.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
             safe_copytree(source, target)
+            if record["name"] == "ponytail":
+                # This entire plugin is replaced on every sync.
+                shutil.copytree(ROOT / "scripts/overlays/ponytail", target, dirs_exist_ok=True)
+                manifest_path = target / ".zcode-plugin/plugin.json"
+                zcode = json.loads(manifest_path.read_text(encoding="utf-8"))
+                zcode["version"] = upstream_version
+                manifest_path.write_text(json.dumps(zcode, indent=2) + "\n", encoding="utf-8")
             version = plugin_version(target)
             print(f"synced plugin {record['name']} {version} -> {target.relative_to(ROOT)}")
         mcp = next(item for item in payload["sources"] if item["kind"] == "mcp")
