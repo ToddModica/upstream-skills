@@ -1,6 +1,6 @@
 {
   "name": "no-negative-echo",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Keep rejected wording and session residue out of final deliverables.",
   "author": {
     "name": "LB623",
@@ -15,7 +15,7 @@
     "quality"
   ],
   "skills": "./skills/",
-  "hooks": "./hooks/hooks.json",
+  "hooks": "./hooks/claude-codex-hooks.json",
   "interface": {
     "displayName": "No Negative Echo",
     "shortDescription": "Clean final deliverables of session residue",

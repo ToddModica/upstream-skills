@@ -43,6 +43,7 @@ jobs:
         run: |
           python scripts/validate_catalog.py
           python tests/test_generate_sources.py
+          python tests/test_marketplace_compat.py
           node plugins/no-negative-echo/hooks/test-no-negative-echo.js
       - name: Commit validated changes
         run: |

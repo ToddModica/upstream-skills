@@ -16,8 +16,8 @@ function buildOutput(event, root, codex) {
 
 if (require.main === module) {
   const event = process.argv[2] || 'SessionStart';
-  const root = process.env.CLAUDE_PLUGIN_ROOT || path.resolve(__dirname, '..');
-  process.stdout.write(buildOutput(event, root, Boolean(process.env.PLUGIN_DATA)));
+  const root = process.env.ZCODE_PLUGIN_ROOT || process.env.CLAUDE_PLUGIN_ROOT || path.resolve(__dirname, '..');
+  process.stdout.write(buildOutput(event, root, Boolean(process.env.PLUGIN_DATA || process.env.ZCODE_PLUGIN_ROOT)));
 }
 
 module.exports = { buildOutput };

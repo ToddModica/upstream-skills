@@ -216,7 +216,7 @@ def search_scopus(
     query: str,
     rows: int = 5,
     view: str | None = None,
-    subscriber: bool = True,
+    subscriber: bool = False,
 ) -> str:
     """Search Scopus documents using a Scopus advanced-search query.
 
@@ -224,7 +224,7 @@ def search_scopus(
         query: Scopus advanced search query.
         rows: Number of normalized results to return (max 50).
         view: Optional Scopus view ("STANDARD" or "COMPLETE").
-        subscriber: Whether to use subscriber cursor navigation.
+        subscriber: Select COMPLETE when True (requires institutional entitlement). Default: STANDARD.
     """
     try:
         return _json_ok(_scopus.search(query, rows, view=view, subscriber=subscriber))

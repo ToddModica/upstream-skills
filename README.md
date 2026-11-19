@@ -262,6 +262,10 @@ https://github.com/ToddModica/upstream-skills
 
 ZCode 可使用根目录 `.zcode-plugin/marketplace.json`，Codex 使用 `.agents/plugins/marketplace.json`；两份清单指向相同 `plugins/` 内容。
 
+Ponytail 和 No Negative Echo 通过各自的 `.zcode-plugin/plugin.json` 注册会话启动 hook。Ponytail 还会在提交提示词时处理模式切换。修改 Ponytail 的 ZCode 适配时，请编辑 `scripts/overlays/ponytail/`，该目录会在同步上游插件后复制到发布包。
+
+学术检索的启动示例从 `mcp-server/requirements.txt` 安装依赖。Scopus 默认使用 `STANDARD` 视图，具有相应机构权限时可显式设置 `view="COMPLETE"`。这两项配置由 `scripts/sync_sources.py` 在复制学术检索技能后应用。
+
 ## 维护者校验
 
 ```powershell
@@ -270,6 +274,7 @@ python .\scripts\update_sources.py
 python .\scripts\sync_sources.py --remote
 python .\scripts\validate_catalog.py
 python .\tests\test_generate_sources.py
+python .\tests\test_marketplace_compat.py
 ```
 
 上游许可证与来源锁的详细状态见 `sources.json` 和 `THIRD_PARTY_NOTICES.md`。

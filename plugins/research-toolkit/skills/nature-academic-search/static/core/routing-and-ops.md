@@ -67,7 +67,7 @@ OpenAlex meters usage per API key and no longer uses the `mailto` polite pool: c
 Use uv to start the MCP server in an isolated dependency environment:
 
 ```bash
-uv run --no-project --directory <mcp-server> --with "mcp>=1.0.0,<2.0.0" --with "requests>=2.28.0,<3.0.0" --with "toml>=0.10.2,<2.0.0" --with "lxml>=4.9.0,<6.0.0" --with "pybliometrics>=4.4.1,<5.0.0" python academic_search_server.py
+uv run --no-project --directory <mcp-server> --with-requirements requirements.txt python academic_search_server.py
 ```
 
 `search_papers` defaults to CrossRef, PubMed, and arXiv. Scopus / ScienceDirect are opt-in providers: include `scopus` / `sciencedirect` in `sources`, or call their dedicated tools. These calls use the local pybliometrics config at `~/.config/pybliometrics.cfg` and may consume Elsevier API quota.

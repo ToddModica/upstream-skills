@@ -39,7 +39,7 @@
 插件会通过以下形式启动隔离运行环境：
 
 ```bash
-uv run --no-project --directory <mcp-server> --with ... python academic_search_server.py
+uv run --no-project --directory <mcp-server> --with-requirements requirements.txt python academic_search_server.py
 ```
 
 这些工具由 `academic-search` skill 调用。
