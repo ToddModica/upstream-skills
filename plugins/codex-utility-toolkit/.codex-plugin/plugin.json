@@ -1,15 +1,15 @@
 {
   "name": "codex-utility-toolkit",
-  "version": "0.3.101",
-  "description": "Upstream presentation, document, PDF, image, Bilibili, PowerShell, frontend design, and Codex skill-development utilities.",
+  "version": "0.3.102",
+  "description": "Upstream presentation, document, Bilibili, PowerShell, frontend design, and plan review utilities.",
   "author": {
     "name": "research-toolkit maintainers"
   },
   "skills": "./skills/",
   "interface": {
     "displayName": "Codex Utility Toolkit",
-    "shortDescription": "Upstream presentation, document, media, PowerShell, frontend, and Skill utilities.",
-    "longDescription": "Contains redistributable upstream Skills for editable PowerPoint generation, PDF and document workflows, image generation, Bilibili reading, safe PowerShell, frontend design, and Codex Skill development.",
+    "shortDescription": "Upstream presentation, document, media, PowerShell, frontend design, and plan review utilities.",
+    "longDescription": "Contains redistributable upstream Skills for editable PowerPoint generation, document workflows, Bilibili reading, safe PowerShell, frontend design, and plan review.",
     "developerName": "research-toolkit maintainers",
     "category": "Productivity",
     "capabilities": [
@@ -18,8 +18,8 @@
     ],
     "defaultPrompt": [
       "Create an editable PowerPoint deck from my source material.",
-      "Help me create a reusable Codex Skill.",
-      "Help me inspect and improve this PDF workflow."
+      "Summarize this Bilibili video from its subtitles.",
+      "Help me stress-test this plan."
     ]
   }
 }

@@ -23,7 +23,7 @@ Tavotto 通过其官方 `plugin-stable` 分支按需拉取，许可证为 **AGPL
 - CAD 运行时：专利工具的 STEP/SVG 处理使用 [`CadQuery`](https://github.com/CadQuery/cadquery)。
 - 图示设计：[`Diagram Design`](https://github.com/cathrynlavery/diagram-design)，MIT 许可证，独立插件归入 `Creativity`，来源为官方 `main` 分支。
 
-`imagegen`、`openai-docs`、`skill-creator`、`skill-installer`、`doc` 与 `pdf` 由 Codex 运行时提供；当前 `sources.json` 不含其可公开锁定的 GitHub 上游地址。
+Codex 的 `imagegen`、`openai-docs`、`skill-creator` 和 `skill-installer` 由内置 Skills 提供，`pdf` 由 Codex 官方 PDF 插件提供。工具包中的 `doc` 来源于 Codex 运行时，其许可信息记录在 `sources.json`。
 
 ## 快速安装
 
@@ -89,13 +89,8 @@ codex plugin add writing-toolkit@research-toolkit-marketplace
 - `design-taste-frontend`
 - `doc`
 - `grilling`
-- `imagegen`
-- `openai-docs`
-- `pdf`
 - `powershell-safe-invocation`
 - `ppt-master`
-- `skill-creator`
-- `skill-installer`
 
 ### ponytail
 

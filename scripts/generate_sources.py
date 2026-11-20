@@ -35,13 +35,8 @@ INCLUDED = {
         "bilibili-page-reader",
         "design-taste-frontend",
         "doc",
-        "imagegen",
-        "openai-docs",
-        "pdf",
         "ppt-master",
         "powershell-safe-invocation",
-        "skill-creator",
-        "skill-installer",
     },
 }
 

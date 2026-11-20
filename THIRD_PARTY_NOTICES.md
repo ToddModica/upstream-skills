@@ -31,7 +31,7 @@ Diagram Design 通过官方仓库 `main` 分支安装。本市场维护来源引
 
 Playwright MCP 由 Microsoft 以 Apache-2.0 许可证发布。本仓库的 `playwright-mcp` 插件只包含本市场编写的清单、MCP 配置与 Skill，不重新分发上游代码；`@playwright/mcp` 及其浏览器构建在安装或首次启动时由 npm 与 Playwright CDN 获取，使用时遵守上游许可证。
 
-由 Codex 本地发行环境提供并带有 Apache-2.0 许可证的 `doc`、`pdf`、`imagegen`、`openai-docs`、`skill-creator` 和 `skill-installer`，其许可证文件保留在各自 Skill 目录中。
+`doc` 来源于 Codex 本地发行环境，采用 Apache-2.0 许可证，许可证文件保留在 Skill 目录中。
 
 `ai-flavor-remover` 当前上游仓库未提供许可证文件，本仓库只在 `sources.json` 中记录来源，不复制其内容。
 
