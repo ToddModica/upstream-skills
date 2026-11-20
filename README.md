@@ -71,7 +71,17 @@ codex plugin add diagram-design@research-toolkit-marketplace
 - `anti-defensive-writing`（中文）
 - `anti-defensive-writing-en`（英文）
 
-可显式调用 `$anti-defensive-writing` 或 `$anti-defensive-writing-en`。撰写或修改论文摘要、引言、结论、实验叙事、论文压缩及审稿回复时，也会按 Skill 描述自动匹配；建议里要求围绕真实贡献组织叙事，并保留与核心主张相关的结果和限制。
+**Anti-Defensive Writing 安装与使用**
+
+添加本市场后，安装 Writing Toolkit 即可获得中英文两个 Skill。
+
+```powershell
+codex plugin add writing-toolkit@research-toolkit-marketplace
+```
+
+在新的 Codex 对话中，中文稿可调用 `$anti-defensive-writing`，英文稿可调用 `$anti-defensive-writing-en`。两者适用于摘要、引言、结论、实验叙事、论文压缩和审稿回复，也会按 Skill 描述自动匹配。使用时围绕论文的实际贡献组织论证，并完整呈现支撑核心主张的证据、相关结果和限制。
+
+中英文版本均使用 MIT 许可证。上游提交及许可证路径见 [`sources.json`](sources.json)。
 
 ### codex-utility-toolkit
 
