@@ -44,12 +44,13 @@ jobs:
           python scripts/validate_catalog.py
           python tests/test_generate_sources.py
           python tests/test_marketplace_compat.py
+          python -m unittest discover -s tests -p 'test_*mcp*.py'
           node plugins/no-negative-echo/hooks/test-no-negative-echo.js
       - name: Commit validated changes
         run: |
           git diff --quiet && exit 0
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add sources.json plugins
+          git add sources.json plugins scripts/windows_mcp_version.txt
           git commit -m 'chore: sync upstream skill sources'
           git push
