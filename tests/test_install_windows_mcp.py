@@ -29,16 +29,20 @@ class WindowsMcpInstallTests(unittest.TestCase):
         ):
             run.return_value.returncode = 1
             self.assertEqual(installer.register(check_only=False), 0)
-            command = run.call_args.args[0]
+            command = run.call_args_list[-2].args[0]
             self.assertEqual(command[:5], ["magpie.com", "library", "mcp", "add", installer.NAME])
             self.assertIn("--local", command)
             self.assertIn("agents=codex", command)
             self.assertEqual(command[-len(installer.ARGS):], installer.ARGS)
+            self.assertEqual(
+                run.call_args.args[0],
+                ["magpie.com", "library", "mcp", "router", installer.NAME, "direct"],
+            )
 
             run.reset_mock()
             run.return_value.returncode = 0
             run.return_value.stdout = json.dumps({
-                "local": True, "agents": ["codex"], "args": installer.ARGS,
+                "local": True, "agents": ["codex"], "args": installer.ARGS, "hub": "direct",
             })
             self.assertEqual(installer.register(check_only=True), 0)
             run.assert_called_once()

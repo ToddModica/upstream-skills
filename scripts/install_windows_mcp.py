@@ -38,8 +38,8 @@ def register(check_only):
         install = [codex, "mcp", "add", NAME, "--env", TELEMETRY, "--", uvx, *ARGS]
     owner = "Magpie Library" if magpie else "Codex"
     result = subprocess.run(lookup, capture_output=True, timeout=30)
-    if result.returncode == 0:
-        current = json.loads(result.stdout)
+    current = json.loads(result.stdout) if result.returncode == 0 else None
+    if current is not None:
         if magpie:
             ready = (
                 current.get("local") is True
@@ -61,6 +61,11 @@ def register(check_only):
         subprocess.run([uvx, *ARGS, "--help"], stdout=subprocess.DEVNULL, check=True, timeout=180)
         if result.returncode:
             subprocess.run(install, check=True, timeout=90)
+    if magpie and (current is None or current.get("hub") != "direct"):
+        if check_only:
+            print("Windows MCP is not configured for local launch by Codex.", file=sys.stderr)
+            return 1
+        subprocess.run([*library, "router", NAME, "direct"], check=True, timeout=25)
     print(f"Windows MCP {VERSION} registered in {owner}.")
     return 0
 

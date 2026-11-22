@@ -63,7 +63,7 @@ python scripts/install_windows_mcp.py
 python scripts/install_windows_mcp.py --check-only
 ```
 
-脚本使用 PyPI 发布的 `windows-mcp==0.9.0`，通过本机 stdio 启动。在安装了 Magpie 的机器上，脚本将它注册到本机 Magpie Library，并分配给 Codex。没有 Magpie 时由 Codex 直接加载。安装后新建 Codex 会话。需要指定工具时，在任务中点名 `Windows MCP`。
+脚本使用 PyPI 发布的 `windows-mcp==0.9.0`。在安装了 Magpie 的机器上，Magpie Library 管理本机注册，Codex 通过 stdio 直接启动 Windows MCP。没有 Magpie 时，脚本直接注册到 Codex。安装后新建 Codex 会话。需要指定工具时，在任务中点名 `Windows MCP`。
 
 ## 插件与 Skills
 
