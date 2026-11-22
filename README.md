@@ -52,6 +52,19 @@ codex plugin add diagram-design@research-toolkit-marketplace
 
 安装后新建 Codex 任务，使 Skills、Hooks 和 MCP 工具加载。
 
+### Windows MCP
+
+[CursorTouch/Windows-MCP](https://github.com/CursorTouch/Windows-MCP) 为 Windows 10 和 11 上的 Codex 提供原生窗口、界面元素和输入操作。Sync Marketplaces 从本仓库读取安装脚本，只在 Windows 上安装和注册。macOS 和 Linux 会跳过。
+
+在 Windows 上也可以单独运行以下命令。需要 Codex CLI、`uvx` 和 Python 3.14 或由 uv 管理的兼容解释器。
+
+```powershell
+python scripts/install_windows_mcp.py
+python scripts/install_windows_mcp.py --check-only
+```
+
+脚本使用 PyPI 发布的 `windows-mcp==0.9.0`，通过本机 stdio 启动。在安装了 Magpie 的机器上，脚本将它注册到本机 Magpie Library，并分配给 Codex。没有 Magpie 时由 Codex 直接加载。安装后新建 Codex 会话。需要指定工具时，在任务中点名 `Windows MCP`。
+
 ## 插件与 Skills
 
 ### research-toolkit
