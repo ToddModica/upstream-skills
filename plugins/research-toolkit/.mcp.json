@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "itasca-mcp": {
-      "command": "uvx",
-      "args": ["itasca-mcp"]
-    }
-  }
-}

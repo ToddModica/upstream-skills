@@ -36,7 +36,7 @@ def main() -> None:
     for item in payload["sources"]:
         if selected and str(item["name"]) not in selected:
             continue
-        if item.get("action") not in {"copy", "copy-plugin", "track-only", "mcp-config-and-addon"}:
+        if item.get("action") not in {"copy", "copy-plugin", "track-only"}:
             continue
         url = item.get("upstream")
         if not url:

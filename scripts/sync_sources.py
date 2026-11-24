@@ -323,11 +323,6 @@ def main() -> None:
         type=Path,
         default=Path(os.environ.get("CODEX_SKILLS_ROOT", Path.home() / ".codex" / "skills")),
     )
-    parser.add_argument(
-        "--itasca-mcp-root",
-        type=Path,
-        default=Path(os.environ.get("ITASCA_MCP_ROOT", Path.home() / ".codex" / "mcp" / "itasca-mcp")),
-    )
     parser.add_argument("--remote", action="store_true", help="clone each GitHub source at its locked SHA before copying")
     parser.add_argument("--check", action="store_true", help="only validate sources and target paths")
     parser.add_argument("--name", action="append", help="synchronize only the named source; may be repeated")
@@ -416,20 +411,6 @@ def main() -> None:
                 manifest_path.write_text(json.dumps(zcode, indent=2) + "\n", encoding="utf-8")
             version = plugin_version(target)
             print(f"synced plugin {record['name']} {version} -> {target.relative_to(ROOT)}")
-        mcp = next(item for item in payload["sources"] if item["kind"] == "mcp")
-        if mcp["action"] == "mcp-config-and-addon" and not args.check and (not selected or str(mcp["name"]) in selected):
-            mcp_source = checkout(mcp, Path(temporary.name), checkout_cache) if args.remote else args.itasca_mcp_root
-            addon = mcp_source / "addon.py"
-            if not addon.is_file():
-                raise RuntimeError(f"MCP addon missing: {addon}")
-            target = ROOT / str(mcp["target"])
-            if not target.resolve().is_relative_to((ROOT / "plugins/research-toolkit/assets").resolve()):
-                raise RuntimeError("MCP target escapes the research-toolkit assets directory")
-            target.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(addon, target)
-            license_file = mcp_source / str(mcp["license_file"])
-            shutil.copy2(license_file, target.parent / "itasca-mcp-LICENSE")
-            print(f"synced itasca-mcp addon -> {target.relative_to(ROOT)}")
     finally:
         if temporary:
             temporary.cleanup()

@@ -95,12 +95,6 @@ def main() -> None:
             fail(f"{path.relative_to(ROOT)}: symbolic links are not allowed")
         if path.is_file() and (path.name in FORBIDDEN_NAMES or (path.name.startswith(".env.") and path.name != ".env.example") or path.suffix.lower() in {".pem", ".key", ".p12", ".pfx"}):
             fail(f"{path.relative_to(ROOT)}: forbidden credential-like file")
-    mcp = json.loads((ROOT / "plugins/research-toolkit/.mcp.json").read_text(encoding="utf-8"))
-    itasca = mcp.get("mcpServers", {}).get("itasca-mcp", {})
-    if itasca.get("command") != "uvx" or itasca.get("args") != ["itasca-mcp"]:
-        fail("research-toolkit: invalid itasca-mcp configuration")
-    if not (ROOT / "plugins/research-toolkit/assets/itasca-mcp-addon.py").is_file():
-        fail("research-toolkit: ITASCA bridge addon is missing")
     playwright_root = ROOT / "plugins/playwright-mcp"
     playwright_mcp = json.loads((playwright_root / ".mcp.json").read_text(encoding="utf-8"))
     playwright_server = playwright_mcp.get("mcpServers", {}).get("playwright", {})

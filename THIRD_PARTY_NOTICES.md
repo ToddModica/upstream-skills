@@ -11,7 +11,6 @@
 | SciPilot Cite Skill | https://github.com/Haojae | MIT | research-toolkit |
 | SciPilot Figure Skill | https://github.com/Haojae | MIT | research-toolkit |
 | SciPilot Writing Skill | https://github.com/Haojae | MIT | research-toolkit |
-| itasca-mcp | https://github.com/yusong652/itasca-mcp | MIT | research-toolkit |
 | agent-skills | https://github.com/Misaka-Mikoto-Tech/agent-skills | MIT | codex-utility-toolkit |
 | humanizer | https://github.com/blader/humanizer | MIT | writing-toolkit |
 | Humanizer-zh | https://github.com/op7418/Humanizer-zh | MIT | writing-toolkit |

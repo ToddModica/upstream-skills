@@ -564,19 +564,6 @@
       "reason": "MIT-licensed thin-client skill using a self-hosted Python HTTP service at http://127.0.0.1:8765. The Marketplace starts the native service on demand; Docker is optional."
     },
     {
-      "kind": "mcp",
-      "name": "itasca-mcp",
-      "upstream": "https://github.com/yusong652/itasca-mcp.git",
-      "branch": "main",
-      "commit_sha": "f0d8a02327281b3d84ef65f78ab128d1f9922f73",
-      "local_relative": null,
-      "target": "plugins/research-toolkit/assets/itasca-mcp-addon.py",
-      "license": "MIT",
-      "license_file": "LICENSE",
-      "action": "mcp-config-and-addon",
-      "reason": "Plugin config uses uvx itasca-mcp; the MIT-licensed bridge addon is retained as an asset."
-    },
-    {
       "kind": "plugin",
       "name": "diagram-design",
       "upstream": "https://github.com/cathrynlavery/diagram-design.git",

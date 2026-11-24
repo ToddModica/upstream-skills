@@ -8,7 +8,7 @@
     {
       "name": "research-toolkit",
       "source": "./plugins/research-toolkit",
-      "description": "Academic research, patent disclosure, Nature-oriented writing, citation, figure, and ITASCA simulation tools.",
+      "description": "Academic research, patent disclosure, Nature-oriented writing, citation, and scientific figures.",
       "category": "Productivity"
     },
     {

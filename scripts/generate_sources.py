@@ -141,18 +141,10 @@ def main() -> None:
         type=Path,
         default=Path(os.environ.get("CODEX_SKILLS_ROOT", Path.home() / ".codex" / "skills")),
     )
-    parser.add_argument(
-        "--mcp-root",
-        type=Path,
-        default=Path(os.environ.get("ITASCA_MCP_ROOT", Path.home() / ".codex" / "mcp" / "itasca-mcp")),
-    )
     args = parser.parse_args()
     source_root = args.skills_root.resolve()
-    mcp_root = args.mcp_root.resolve()
     if not source_root.is_dir():
         raise SystemExit(f"Skill root does not exist: {source_root}")
-    if not mcp_root.is_dir():
-        raise SystemExit(f"ITASCA MCP root does not exist: {mcp_root}")
     previous_records: list[dict[str, object]] = []
     previous: dict[str, dict[str, object]] = {}
     if args.output.is_file():
@@ -211,20 +203,6 @@ def main() -> None:
             "action": action,
             "reason": reason,
         })
-    mcp_license, mcp_license_file = license_id(mcp_root)
-    records.append({
-        "kind": "mcp",
-        "name": "itasca-mcp",
-        "upstream": git(mcp_root, "remote", "get-url", "origin"),
-        "branch": git(mcp_root, "branch", "--show-current"),
-        "commit_sha": git(mcp_root, "rev-parse", "HEAD"),
-        "local_relative": None,
-        "target": "plugins/research-toolkit/assets/itasca-mcp-addon.py",
-        "license": mcp_license,
-        "license_file": mcp_license_file,
-        "action": "mcp-config-and-addon" if mcp_license == "MIT" else "record-only",
-        "reason": "Plugin config uses uvx itasca-mcp; the MIT-licensed bridge addon is retained as an asset.",
-    })
     records = merge_records(previous_records, records)
     payload = {
         "schema_version": 1,

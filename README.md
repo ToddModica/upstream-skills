@@ -19,7 +19,7 @@ Tavotto 通过其官方 `plugin-stable` 分支按需拉取，许可证为 **AGPL
 - 专利与 SciPilot：[`patent-disclosure-skill`](https://github.com/handsomestWei/patent-disclosure-skill)；[`scipilot-cite-skill`](https://github.com/Haojae/scipilot-cite-skill)、[`scipilot-figure-skill`](https://github.com/Haojae/scipilot-figure-skill)、[`scipilot-writing-skill`](https://github.com/Haojae/scipilot-writing-skill)。
 - 写作：[`humanizer`](https://github.com/blader/humanizer)、[`humanizer-zh`](https://github.com/op7418/Humanizer-zh)、[`shuorenhua`](https://github.com/MrGeDiao/shuorenhua)、[`stop-slop`](https://github.com/hardikpandya/stop-slop)、[`anti-defensive-writing`（中文）与 `anti-defensive-writing-en`（英文）](https://github.com/Adkid-Zephyr/anti-defensive-writing-Skill)。
 - 开发与文档：[`bilibili-page-reader`、`powershell-safe-invocation`](https://github.com/Misaka-Mikoto-Tech/agent-skills)、[`design-taste-frontend`](https://github.com/Leonxlnx/taste-skill)、[`ppt-master`](https://github.com/hugohe3/ppt-master)、[`grilling`](https://github.com/mattpocock/skills)。
-- 插件与 MCP：[`ponytail`](https://github.com/DietrichGebert/ponytail)、[`watermarks-remover`](https://github.com/guillaumemeyer/watermarks-remover)、[`no-negative-echo`](https://github.com/LB623/no-negative-echo)、[`itasca-mcp`](https://github.com/yusong652/itasca-mcp)、[`Playwright MCP`](https://github.com/microsoft/playwright-mcp)、[`Tavotto`](https://github.com/Tavotto/Tavotto)。Tavotto 的插件来源固定为上游 `plugin-stable` 发布分支。
+- 插件与 MCP：[`ponytail`](https://github.com/DietrichGebert/ponytail)、[`watermarks-remover`](https://github.com/guillaumemeyer/watermarks-remover)、[`no-negative-echo`](https://github.com/LB623/no-negative-echo)、[`Playwright MCP`](https://github.com/microsoft/playwright-mcp)、[`Tavotto`](https://github.com/Tavotto/Tavotto)。Tavotto 的插件来源固定为上游 `plugin-stable` 发布分支。
 - CAD 运行时：专利工具的 STEP/SVG 处理使用 [`CadQuery`](https://github.com/CadQuery/cadquery)。
 - 图示设计：[`Diagram Design`](https://github.com/cathrynlavery/diagram-design)，MIT 许可证，独立插件归入 `Creativity`，来源为官方 `main` 分支。
 
@@ -75,7 +75,6 @@ GitHub Actions 定期检查 PyPI 的稳定版，并更新 [Windows MCP 版本锁
 - 中国专利：`patent-disclosure-skill` 及其申请、检索、解读、审查答复和专利地图工作流
 - Nature：`nature-academic-search`、`nature-citation`、`nature-data`、`nature-figure`、`nature-paper2ppt`、`nature-polishing`、`nature-reader`、`nature-response`、`nature-writing`
 - SciPilot：`scipilot-cite-skill`、`scipilot-figure-skill`、`scipilot-writing-skill`
-- ITASCA MCP：通过 `uvx itasca-mcp` 启动；桥接文件位于 `plugins/research-toolkit/assets/itasca-mcp-addon.py`
 
 ### writing-toolkit
 
