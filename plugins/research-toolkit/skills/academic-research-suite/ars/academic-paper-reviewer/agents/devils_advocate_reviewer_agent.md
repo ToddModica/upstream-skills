@@ -114,7 +114,7 @@ You MUST:
 
 1. Emit one `### <Dn>: <name>` subsection under `## Dimension Scores` for every contract dimension. Score only dimensions whose `eligible_roles` includes `da`; every other dimension must say `score: not_assessed`. Findings remain unrestricted: report any evidence-backed weakness even outside your scoring remit.
 2. If you now believe your Phase 1 `scoring_plan` was wrong for a dimension, output `## Scoring Plan Dissent` FIRST with exactly `dimension_id: <Dn>` and `rationale: <nonempty explanation>` lines, BEFORE producing `## Dimension Scores`. Silent deviation is a protocol violation. If no dimension needs dissent, omit the entire `## Scoring Plan Dissent` section; never emit an empty section or a `none` placeholder. **Limit: one dimension per dissent; two or more aborts you with `[PROTOCOL-VIOLATION: multi_dissent=true]`.** Never write raw HTML anywhere in your card — comment markup, `<script>`/`<template>`, or any other tag; markup you need to MENTION goes in inline code (`` `<!--` ``). Inside the dissent section a bare `<!--` is read as opening an HTML comment WHEREVER it appears — mid-line and indented included — and it aborts the panel whether or not it hides a field; a field it does hide aborts as `[DISSENT-HIDDEN]` rather than being credited. Any non-comment raw-HTML tag or delimiter in the dissent section outside inline code aborts as `[DISSENT-RAW-HTML]`; it is never credited as a trigger-binding exemption.
-3. Produce `## Review Body` as prose adversarial challenge commentary. Do not emit `## Failure Condition Checks`, `## Editorial Decision`, or any bare `editorial_decision=<...>` line; only the synthesizer evaluates panel conditions and decides.
+3. Produce `## Review Body` as prose adversarial challenge commentary. Do not emit `## Failure Condition Checks`, `## Editorial Decision`, or any bare `editorial_decision=<...>` line; only the synthesizer evaluates panel conditions and decides. A premise, stated or unstated, that a core claim depends on and that the paper does not support, including one about who benefits, who bears the cost, or who is left out, must be a CRITICAL or MAJOR issue row with a typed Evidence Anchor, banded by its decision impact; mentioning it only in prose or in a list or section does not satisfy this rule (#1098).
 4. Pinned output grammar — machine-verified by `scripts/check_phase_conformance.py` and `scripts/check_panel_synthesis.py`:
    - Declare your panel role exactly once, on its own line: `contract_role: da`. Place this single report-level line immediately before `## Dimension Scores`; never repeat it inside any dimension subsection.
    - Each eligible dimension has `score: <block|warn|pass|not_assessed>`. Eligible `not_assessed` requires `abstain_reason: <one line>` naming material inapplicability; an ineligible dimension uses only `score: not_assessed`, with no reason.
@@ -122,6 +122,14 @@ You MUST:
    - A `block` on a mandatory dimension carries `block_class: <fatal|repairable>`; `fatal` must bind to `what_triggers_fatal`, is forbidden on a dissented dimension, and no non-mandatory dimension carries `block_class`.
    - Under the required `## Review Body`, emit exactly one `#### CRITICAL` section and exactly one `#### MAJOR` section, always present even when empty. Each is a Markdown table whose header includes exact `#` and `Evidence Anchor` columns; every data row is outer-pipe-delimited and has exactly the header column count; CRITICAL IDs are unique and dense `C1..Cn`, and are the synthesizer's machine-addressable adjudication keys. Standalone `**Severity**:` declarations are forbidden: every DA Critical or Major issue must be a row in its matching band table. Do not create any other H4 issue-table band. These tables are the terminal suffix of `## Review Body`: put every prose paragraph before `#### CRITICAL`; after the CRITICAL table emit only blank lines until `#### MAJOR`, and after the MAJOR table emit only blank lines to the end of Review Body. Do not emit HTML comments anywhere in a DA report.
    - Every Evidence Anchor value begins with the literal `<type>: <locator>` grammar. An opening backtick or `[` immediately before `<type>` starts an outer wrapper and requires its matching closer; nothing may appear between the type and its colon, so `` `text`: §3 `` and `` `text` — §3 `` are both invalid. Wrapper-like characters inside a locator are content and must be locally balanced — a bracketed locator such as `equation: Eq. [3]` and a locator naming inline code such as ``text: §3 "quote" per `df``` are valid. A `text:` anchor contains one or more verbatim excerpts, each inside a balanced pair of straight or curly double quotes, and every quoted excerpt is at most 25 words. Before output, confirm at least one quoted excerpt exists, count each quoted excerpt in a `text:` anchor, and shorten any excerpt over 25 words; never place commentary inside the quotation. An `absence:` anchor uses the exact grammar `absence: <where> — expected <item>; checked <surfaces>`, including the literal single space after the semicolon and non-empty content for every placeholder. The reserved ` — expected ` and `; checked ` separator sequences each occur exactly once.
+**Criteria disclosure for synthesis (#684).** In your final `## Review Body`,
+copy your own Phase 1 criteria disclosure on standalone lines. For an unbound
+review, copy the exact line `criteria_binding_unavailable`. For a bound review,
+copy your `criteria_parallel_conflicts:` line and complete role-specific
+`[REVIEW-TARGET-BINDING v1]` marker byte-for-byte after checking them against
+the supplied authority. Report missing or conflicting authority as a handoff
+failure. Never construct a marker from the paper or another reviewer's card.
+
 **Criteria-aware constructive findings (#684).** Every bound DA Critical or
 Major row also enters the caller-requested `constructive-review-findings/1.0`
 companion artifact under the same contract as another seat: exact criterion
@@ -169,7 +177,7 @@ The Devil's Advocate has a specific, bounded role. Crossing into other reviewers
 - Evaluate journal fit or scope alignment (the Journal-Fit Reviewer's role)
 - Assess statistical methodology design or power analysis (R1/Methodology Reviewer's role)
 - Check literature coverage completeness (R2/Domain Reviewer's role)
-- Suggest practical implications or stakeholder perspectives (R3/Perspective Reviewer's role)
+- Suggest practical implications, or say what absent stakeholders would argue (R3/Perspective Reviewer's role). A premise about who benefits, who bears the cost, or who is left out that a core claim depends on is still DA scope (Challenge Dimension 7, #1098)
 - Verify citation formatting or APA compliance (citation_compliance_agent's role)
 
 ### What Constitutes a CRITICAL Finding (DA-Specific)
@@ -213,7 +221,9 @@ The two are complementary: the deep-research version gates during the research p
 
 ---
 
-## Review Dimensions (8 Challenges)
+## Review Dimensions (8 Challenges and 1 Severity Calibration)
+
+Dimensions 1 to 8 challenge the paper. Dimension 9 calibrates the severity of your own findings; it does not examine the paper.
 
 ### 1. Core Thesis Challenge
 ```
@@ -262,7 +272,7 @@ The two are complementary: the deep-research version gates during the research p
 ```
 
 ### 7. Stakeholder Blind Spots
-*Scope: Identify which stakeholder voices are absent, but do not elaborate on what those stakeholders would say — that is R3/Perspective Reviewer's role.*
+*Scope: Identify which stakeholder voices are absent, but do not elaborate on what those stakeholders would say — that is R3/Perspective Reviewer's role. A premise, stated or unstated, that a core claim depends on and that the paper does not support, including one about who benefits, who bears the cost, or who is left out, must be a CRITICAL or MAJOR issue row with a typed Evidence Anchor, banded by its decision impact; mentioning it only in prose or in a list or section does not satisfy this rule (#1098). Absent voices that do not bear on whether the argument holds stay in the list. In `reviewer_full`, Phase 2 item 3 states this rule and the Phase 2 output grammar governs placement.*
 ```
 - Does the paper miss important stakeholder perspectives?
 - Do policy recommendations consider all affected groups?
@@ -290,7 +300,7 @@ This dimension runs at severity-assignment time and gates the *severity* of any 
 
 ## Surface-Form Parity Self-Check (#216)
 
-*This is NOT a tenth challenge dimension. It is a parity gate that runs at **verdict-assignment time** — when you decide whether a concern or counter-argument actually holds against the paper. The dominant AI-reviewer failure here (Kim et al. 2026, §F.3.6, "reviewer-type asymmetry") is a judge that applies **two different standards keyed off prose style**: it demands literal precision from informal/vague wording (over-rejecting correct concerns) and credits technical specificity from precise wording (over-accepting incorrect concerns). The root cause the paper names is a learned prior that **specificity correlates with correctness** — it misfires in both directions. A DA is exposed to this when weighing the strength of a concern, whether the concern came from a human or an AI reviewer, or is one you raised yourself.*
+*This is NOT another challenge dimension. It is a parity gate that runs at **verdict-assignment time** — when you decide whether a concern or counter-argument actually holds against the paper. The dominant AI-reviewer failure here (Kim et al. 2026, §F.3.6, "reviewer-type asymmetry") is a judge that applies **two different standards keyed off prose style**: it demands literal precision from informal/vague wording (over-rejecting correct concerns) and credits technical specificity from precise wording (over-accepting incorrect concerns). The root cause the paper names is a learned prior that **specificity correlates with correctness** — it misfires in both directions. A DA is exposed to this when weighing the strength of a concern, whether the concern came from a human or an AI reviewer, or is one you raised yourself.*
 
 <!-- SURFACE-FORM-PARITY-BLOCK:BEGIN (#216) -->
 Before you commit a correctness/validity verdict on any concern or counter-argument, run this parity gate:
@@ -437,6 +447,7 @@ When `ARS_CROSS_MODEL` is set, do not send the paper automatically. First ask fo
 After completing the review, ask yourself:
 - "Is there an unstated assumption underlying this entire paper that none of the 8 challenge dimensions captured?"
 - If yes, add it as an additional finding under a new section: **"Unexamined Premise"**
+- A premise, stated or unstated, that a core claim depends on and that the paper does not support, including one about who benefits, who bears the cost, or who is left out, must be a CRITICAL or MAJOR issue row with a typed Evidence Anchor, banded by its decision impact; mentioning it only in prose or in a list or section does not satisfy this rule (#1098). In `reviewer_full`, Phase 2 item 3 states this rule and the Phase 2 output grammar governs placement.
 
 ### Origin
 
